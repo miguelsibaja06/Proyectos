@@ -1,341 +1,433 @@
 @import url('https://fonts.googleapis.com/css2?family=Playwrite+NO:wght@100..400&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&display=swap');
 
-html,
-body {
-  width: 100%;
-  height: 100%;
-  overflow-x: hidden;
-  overflow-y: hidden;
-  background: #0a0a1a;
+/* ================================================================
+   VARIABLES — MUNDO REAL (azul/morado oscuro)
+   ================================================================ */
+body.mundo-real {
+  --accent:        #b49fcc;
+  --accent2:       #c9a84c;
+  --glow2:         rgba(245, 230, 66, .8);
+  --fog-color:     rgba(180, 159, 204, 0.2);
+  --moon-bg:       #f5e8a0;
+  --moon-shadow:   rgba(245, 232, 160, .6);
+  --moon-shadow2:  rgba(245, 232, 160, .8);
+  --bg:            #0a0a1a;
+  --web-color:     rgba(180, 159, 204, .5);
+  --firefly:       #f5e642;
+  --firefly-glow:  rgba(245, 230, 66, .6);
+  --titulo-color:  #b49fcc;
+  --titulo-shadow: rgba(180, 159, 204, .7);
+  --msg-color:     #c9a84c;
+  --msg-glow:      rgba(245, 230, 66, .8);
 }
 
-#cake {
-  display: block;
-  position: relative;
-  width: min(200px, 52vw);   /* se achica en pantallas pequeñas */
-  height: auto;
-  margin: -10em auto 0 auto;
-  overflow: hidden;
+/* ================================================================
+   VARIABLES — OTRA MADRE (rojo oscuro)
+   ================================================================ */
+body.otra-madre {
+  --accent:        #c0392b;
+  --accent2:       #ff6b6b;   
+  --glow2:         rgba(255, 107, 107, .9);
+  --fog-color:     rgba(139, 0, 0, 0.25);
+  --moon-bg:       #8b0000;
+  --moon-shadow:   rgba(192, 57, 43, .7);
+  --moon-shadow2:  rgba(231, 76, 60, .9);
+  --bg:            #0d0000;
+  --web-color:     rgba(192, 57, 43, .5);
+  --firefly:       #e74c3c;
+  --firefly-glow:  rgba(192, 57, 43, .7);
+  --titulo-color:  rgba(233, 198, 198, 0.788);  /* título */
+  --titulo-shadow: rgba(245, 235, 224, .4);
+  --msg-color:     #BAB8B5;   /* mensaje */
+  --msg-glow:      rgba(245, 235, 224, .35);
 }
 
+/* ================================================================
+   BASE
+   ================================================================ */
+html, body {
+  width: 100%; height: 100%;
+  overflow-x: hidden; overflow-y: hidden;
+  background: var(--bg);
+  transition: background 0.8s ease;
+}
 
-.velas {
-  background: #fbfbfb;
-  border-radius: 10px;
+/* ================================================================
+   TOGGLE
+   ================================================================ */
+.toggle-wrap {
+  position: fixed;
+  top: 18px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--accent);
+  border-radius: 40px;
+  padding: 6px 18px;
+  transition: border-color 0.6s;
+  backdrop-filter: blur(6px);
+}
+
+.toggle-label {
+  font-family: 'Cinzel Decorative', cursive;
+  font-size: clamp(0.5rem, 2vw, 0.7rem);
+  letter-spacing: 2px;
+  color: #555;
+  transition: color 0.5s;
+  white-space: nowrap;
+}
+body.mundo-real #lbl-real { color: var(--accent); }
+body.otra-madre #lbl-otra  { color: var(--accent); }
+
+.toggle-btn {
+  width: 52px; height: 26px;
+  border-radius: 99px;
+  border: 1.5px solid var(--accent);
+  background: transparent;
+  cursor: pointer; position: relative;
+  transition: border-color 0.5s;
+  flex-shrink: 0;
+}
+
+.toggle-knob {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
   position: absolute;
-  top: 228px;
-  left: 50%;
-  margin-left: -2.4px;
-  margin-top: -8.33333333px;
-  width: 5px;
-  height: 35px;
-  transform: translateY(-300px);
+  top: 3px; left: 3px;
+  transition: transform 0.5s cubic-bezier(.68, -.55, .27, 1.55), background 0.5s;
+  display: flex; align-items: center; justify-content: center;
+}
+body.otra-madre .toggle-knob { transform: translateX(26px); }
+
+.boton-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+.boton-dot::before, .boton-dot::after {
+  content: ''; position: absolute;
+  border-radius: 50%; border: 1px solid rgba(0, 0, 0, 0.4);
+}
+.boton-dot::before { width: 3px; height: 3px; top: -4px; left: 0; }
+.boton-dot::after  { width: 3px; height: 3px; top: 4px;  left: 0; }
+
+/* ================================================================
+   CAKE
+   ================================================================ */
+#cake {
+  display: block; position: relative;
+  width: min(200px, 52vw); height: auto;
+  margin: -10em auto 0 auto; overflow: hidden;
+  transition: filter 0.8s ease;
+}
+body.otra-madre #cake { filter: sepia(0.4) hue-rotate(-30deg) saturate(1.5); }
+
+/* ================================================================
+   VELAS
+   ================================================================ */
+.velas {
+  background: #fbfbfb; border-radius: 10px;
+  position: absolute; top: 228px; left: 50%;
+  margin-left: -2.4px; margin-top: -8.33px;
+  width: 5px; height: 35px;
+  transform: translateX(-50%) translateY(-300px);
   backface-visibility: hidden;
   animation: in 500ms 6s ease-out forwards;
 }
-
-.velas:after,
-.velas:before {
-  background: #c8d9e0;
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 2.22222222px;
+.velas:after, .velas:before {
+  background: #c8d9e0; content: ""; position: absolute;
+  width: 100%; height: 2.22px;
 }
-.velas:after {
-  top: 25%;
-  left: 0;
-}
-.velas:before {
-  top: 45%;
-  left: 0;
-}
+.velas:after  { top: 25%; left: 0; }
+.velas:before { top: 45%; left: 0; }
 
 .fuego {
-  border-radius: 100%;
-  position: absolute;
-  top: -25px;
-  left: 50%;
-  margin-left: -4.6px;
-  width: 8.66666667px;
-  height: 28px;
+  border-radius: 100%; position: absolute;
+  top: -25px; left: 50%; margin-left: -4.6px;
+  width: 8.67px; height: 28px;
 }
+
+/* Fuego — Mundo Real */
 .fuego:nth-child(1) { animation: fuego 2s   6.5s infinite; }
 .fuego:nth-child(2) { animation: fuego 1.5s 6.5s infinite; }
 .fuego:nth-child(3) { animation: fuego 1s   6.5s infinite; }
 .fuego:nth-child(4) { animation: fuego 0.5s 6.5s infinite; }
 .fuego:nth-child(5) { animation: fuego 0.2s 6.5s infinite; }
 
+/* Fuego — Otra Madre */
+body.otra-madre .fuego:nth-child(1) { animation: fuego-rojo 2s   6.5s infinite; }
+body.otra-madre .fuego:nth-child(2) { animation: fuego-rojo 1.5s 6.5s infinite; }
+body.otra-madre .fuego:nth-child(3) { animation: fuego-rojo 1s   6.5s infinite; }
+body.otra-madre .fuego:nth-child(4) { animation: fuego-rojo 0.5s 6.5s infinite; }
+body.otra-madre .fuego:nth-child(5) { animation: fuego-rojo 0.2s 6.5s infinite; }
+
 @keyframes fuego {
-  0%, 100% {
-    background: rgba(254, 248, 97, 0.5);
-    box-shadow: 0 0 40px 10px rgba(248, 233, 209, 0.2);
-    transform: translateY(0) scale(1);
-  }
-  50% {
-    background: rgba(255, 50, 0, 0.1);
-    box-shadow: 0 0 40px 20px rgba(248, 233, 209, 0.2);
-    transform: translateY(-20px) scale(0);
-  }
+  0%, 100% { background: rgba(254,248,97,.5); box-shadow: 0 0 40px 10px rgba(248,233,209,.2); transform: translateY(0) scale(1); }
+  50%       { background: rgba(255,50,0,.1);  box-shadow: 0 0 40px 20px rgba(248,233,209,.2); transform: translateY(-20px) scale(0); }
+}
+@keyframes fuego-rojo {
+  0%, 100% { background: rgba(220,50,50,.7); box-shadow: 0 0 40px 10px rgba(180,30,30,.4); transform: translateY(0) scale(1); }
+  50%       { background: rgba(255,0,0,.2);  box-shadow: 0 0 40px 20px rgba(180,30,30,.3); transform: translateY(-20px) scale(0); }
 }
 
-@keyframes in {
-  to {
-    transform: translateX(-50%) translateY(0);
-  }
-}
+@keyframes in { to { transform: translateX(-50%) translateY(0); } }
 
-/* ─── TEXTO ──────────────────────────────────────────────*/
-.text {
-  text-align: center;
-  padding: 0 1rem;           /* evita que el texto toque los bordes */
-}
+/* ================================================================
+   TEXTO
+   ================================================================ */
+.text { text-align: center; padding: 0 1rem; }
 
-.text h1 {
+/* Títulos */
+.titulo-mundo-real,
+.titulo-otra-madre {
   font-family: 'Cinzel Decorative', cursive;
   font-size: clamp(0.65rem, 3vw, 1rem);
-  letter-spacing: 3px;
-  color: #b49fcc;
-  text-shadow: 0 0 12px rgba(180,159,204,.7);
-  margin-bottom: 10px;
+  letter-spacing: 3px; margin-bottom: 10px;
+  transition: opacity 0.6s ease;
 }
 
+/* Mundo Real: muestra titulo real, oculta otra madre */
+.titulo-mundo-real { color: var(--titulo-color); text-shadow: 0 0 12px var(--titulo-shadow); }
+.titulo-otra-madre { display: none; }
+
+/* Otra Madre: oculta titulo real, muestra otra madre */
+body.otra-madre .titulo-mundo-real { display: none; }
+body.otra-madre .titulo-otra-madre {
+  display: block;
+  color: var(--titulo-color);
+  text-shadow: 0 0 12px var(--titulo-shadow);
+}
+
+/* Mensaje tipografiado */
 #msg {
   font-family: 'Cinzel Decorative', cursive;
   font-size: clamp(0.9rem, 3.5vw, 1.8rem);
-  color: #f5e642;
-  text-shadow: 0 0 16px rgba(245,230,66,.8);
-  border-right: 2px solid #c9a84c;
-  white-space: normal;
-  word-break: break-word;
-  text-align: center;
-  padding: 0 10px;
-  display: inline-block;
-  max-width: 90vw;           /* nunca desborda la pantalla */
+  color: var(--msg-color);
+  text-shadow: 0 0 16px var(--msg-glow);
+  border-right: 2px solid var(--msg-color);
+  white-space: normal; word-break: break-word;
+  text-align: center; padding: 0 10px;
+  display: inline-block; max-width: 90vw;
+  transition: color 0.6s, text-shadow 0.6s, border-color 0.6s;
 }
 
-/* ─── CONFETI ────────────────────────────────────────────*/
-.confeti {
-  position: fixed;
-  top: -20px;
-  pointer-events: none;
-  z-index: 9999;
-}
-
-@keyframes caer {
-  to {
-    transform: translateY(100vh) rotate(720deg);
-    opacity: 0;
-  }
-}
-
-/* ─── ESTRELLAS ──────────────────────────────────────────*/
+/* ================================================================
+   ESTRELLAS
+   ================================================================ */
 #stars-canvas {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 0;
 }
 
-/* ─── ARAÑA ──────────────────────────────────────────────
-   Antes: left:25% + translateX(-25%) → offset raro en móvil
-   Fix:   left:50% + translateX(-50%) = centrado real       */
+/* ================================================================
+   ARAÑA
+   ================================================================ */
 .spider-wrap {
-  position: fixed;
-  top: 0;
-  left: 30%;
+  position: fixed; top: 0; left: 20%;
   transform: translateX(-50%);
-  pointer-events: none;
-  z-index: 10;
+  pointer-events: none; z-index: 10;
   animation: spiderDrop 14s ease-in-out infinite;
 }
-
 @keyframes spiderDrop {
-  0%   { transform: translateX(-50%) translateY(-60px); }
-  30%  { transform: translateX(-50%) translateY(120px); }
-  60%  { transform: translateX(-50%) translateY(80px);  }
-  80%  { transform: translateX(-50%) translateY(200px); }
-  100% { transform: translateX(-50%) translateY(-60px); }
+  0%   { transform: translateX(-50%) translateY(-60px);  }
+  30%  { transform: translateX(-50%) translateY(120px);  }
+  60%  { transform: translateX(-50%) translateY(80px);   }
+  80%  { transform: translateX(-50%) translateY(200px);  }
+  100% { transform: translateX(-50%) translateY(-60px);  }
 }
-
 .thread {
-  width: 1px;
-  height: 260px;
-  background: linear-gradient(to bottom, transparent, rgba(180,159,204,.6));
-  margin: 0 auto;
+  width: 1px; height: 260px;
+  background: linear-gradient(to bottom, transparent, var(--web-color));
+  margin: 0 auto; transition: background 0.6s;
 }
-
 .spider {
-  font-size: 20px;
-  text-align: center;
-  filter: drop-shadow(0 0 4px rgba(180,159,204,.8));
+  font-size: 20px; text-align: center;
+  filter: drop-shadow(0 0 4px var(--accent));
+  transition: filter 0.6s;
 }
 
-/* ─── LUCIÉRNAGAS ────────────────────────────────────────*/
+/* ================================================================
+   LUCIÉRNAGAS
+   ================================================================ */
 .firefly {
-  position: fixed;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #f5e642;
-  box-shadow: 0 0 6px 3px rgba(245,230,66,.6);
-  pointer-events: none;
-  z-index: 1;
+  position: fixed; width: 4px; height: 4px; border-radius: 50%;
+  background: var(--firefly); box-shadow: 0 0 6px 3px var(--firefly-glow);
+  pointer-events: none; z-index: 1;
   animation: drift linear infinite;
 }
-
 @keyframes drift {
-  0%   { transform: translate(0,0) scale(1); opacity: 0; }
+  0%   { transform: translate(0, 0) scale(1); opacity: 0; }
   20%  { opacity: 1; }
   80%  { opacity: .8; }
   100% { transform: translate(var(--dx), var(--dy)) scale(0.3); opacity: 0; }
 }
 
-/* ─── NIEBLA ─────────────────────────────────────────────*/
+/* ================================================================
+   NIEBLA
+   ================================================================ */
 .fog {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 50%;
-  background: linear-gradient(
-    to top,
-    rgba(180,159,204, 0.2) 0%,
-    rgba(10, 10, 26, 0.15) 60%,
-    transparent 100%
-  );
-  pointer-events: none;
-  z-index: 5;
+  position: fixed; bottom: 0; left: 0; width: 100%; height: 50%;
+  background: linear-gradient(to top, var(--fog-color) 0%, rgba(10,10,26,.15) 60%, transparent 100%);
+  pointer-events: none; z-index: 5; transition: background 0.8s ease;
 }
 
-/* ─── LUNA ───────────────────────────────────────────────
-   Antes: right:80px fijo → se salía o superponía en móvil
-   Fix:   right con clamp + tamaño proporcional            */
+/* ================================================================
+   LUNA 
+   ================================================================ */
 .moon {
   position: fixed;
-  top: clamp(20px, 5vw, 40px);
-  right: clamp(12px, 6vw, 80px);
-  width: clamp(55px, 14vw, 90px);
-  height: clamp(55px, 14vw, 90px);
+  top: clamp(20px, 5vw, 40px); right: clamp(12px, 6vw, 80px);
+  width: clamp(55px, 14vw, 90px); height: clamp(55px, 14vw, 90px);
   border-radius: 50%;
-  background: #f5e8a0;
-  box-shadow: 0 0 25px rgba(245,232,160,.6);
-  z-index: 3;
-  animation: moonGlow 4s ease-in-out infinite;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: var(--moon-bg); box-shadow: 0 0 25px var(--moon-shadow);
+  z-index: 3; animation: moonGlow 4s ease-in-out infinite;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.8s ease, box-shadow 0.8s ease;
 }
 
+/* ── LUNA — Mundo Real: ojos normales ── */
 .moon-eyes {
-  display: flex;
-  gap: clamp(6px, 2vw, 12px);
-  opacity: 0;
-  animation: aparecerOjos 3s ease-in-out 2s forwards;
+  display: flex; gap: clamp(6px, 2vw, 12px);
+  opacity: 0; animation: aparecerOjos 3s ease-in-out 1s forwards;
 }
-
-@keyframes aparecerOjos {
-  to { opacity: 1; }
-}
+.moon-eyes.blink { opacity: 0 !important; transition: opacity 0.05s; }
+@keyframes aparecerOjos { to { opacity: 1; } }
 
 .moon .eye {
-  width: clamp(10px, 3vw, 18px);
-  height: clamp(10px, 3vw, 18px);
-  background: #0a0a1a;
-  border-radius: 50%;
-  position: relative;
+  width: clamp(10px, 3vw, 18px); height: clamp(10px, 3vw, 18px);
+  background: #0a0a1a; border-radius: 50%; position: relative;
 }
-
 .moon .pupil {
-  width: clamp(3px, 1vw, 6px);
-  height: clamp(3px, 1vw, 6px);
-  background: #f5e642;
-  border-radius: 50%;
-  position: absolute;
-  top: 50%;
-  left: 50%;
+  width: clamp(3px, 1vw, 6px); height: clamp(3px, 1vw, 6px);
+  background: #f5e642; border-radius: 50%;
+  position: absolute; top: 50%; left: 50%;
   transform: translate(-50%, -50%);
 }
 
+/* Ocultar ojos normales en Otra Madre */
+body.otra-madre .moon-eyes { display: none; }
+
+/* ── LUNA — Otra Madre: ojos botón ── */
+.button-eyes {
+  display: none;
+  gap: clamp(6px, 2vw, 12px);
+  align-items: center; justify-content: center;
+}
+
+/* Mostrar ojos botón en Otra Madre */
+body.otra-madre .button-eyes { display: flex; }
+
+.button-eye {
+  width: clamp(12px, 3.5vw, 20px); height: clamp(12px, 3.5vw, 20px);
+  border-radius: 50%; background: #1a0000;
+  border: 2px solid #c0392b;
+  box-shadow: 0 0 6px rgba(192,57,43,.8), inset 0 0 4px rgba(192,57,43,.4);
+  position: relative; animation: buttonPulse 2s ease-in-out infinite;
+}
+/* Pupila de los ojos botón (se mueve con JS igual que en mundo real) */
+.button-pupil {
+  width: 35%; height: 35%;
+  border-radius: 50%;
+  background: #ede8e1;
+  box-shadow: 0 0 4px rgba(192,57,43,1);
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+/* Círculo decorativo punteado */
+.button-eye::after {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 140%; height: 140%; border-radius: 50%;
+  border: 1px dashed rgba(192,57,43,.5);
+}
+/* Parpadeo botón */
+.button-eye.blink-btn {
+  transform: scaleY(0.05) !important;
+  transition: transform 0.05s;
+}
+
+@keyframes buttonPulse {
+  0%,100% { box-shadow: 0 0 6px rgba(192,57,43,.8), inset 0 0 4px rgba(192,57,43,.4); }
+  50%      { box-shadow: 0 0 14px rgba(192,57,43,1), inset 0 0 8px rgba(192,57,43,.6); }
+}
 @keyframes moonGlow {
-  0%, 100% { filter: drop-shadow(0 0 18px rgba(245,232,160,.5)); }
-  50%       { filter: drop-shadow(0 0 30px rgba(245,232,160,.8)); }
+  0%,100% { filter: drop-shadow(0 0 18px var(--moon-shadow)); }
+  50%      { filter: drop-shadow(0 0 30px var(--moon-shadow2)); }
 }
 
-/* ─── TELARAÑAS ──────────────────────────────────────────*/
+/* ================================================================
+   TELARAÑAS
+   ================================================================ */
 .web {
-  position: fixed;
-  top: 0;
-  width: clamp(70px, 20vw, 120px);   /* se achica en móvil */
-  height: clamp(70px, 20vw, 120px);
-  pointer-events: none;
-  z-index: 3;
-  opacity: 1;
+  position: fixed; top: 0;
+  width: clamp(70px, 20vw, 120px); height: clamp(70px, 20vw, 120px);
+  pointer-events: none; z-index: 3;
 }
-
 .web-left  { left: 0; }
 .web-right { right: 0; transform: scaleX(-1); }
-
-.web::before,
-.web::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+.web::before, .web::after {
+  content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+}
+.web::before {
   background:
     linear-gradient(135deg, rgb(254,254,254) 1px, transparent 1px),
     linear-gradient(112deg, rgb(255,255,255) 1px, transparent 1px),
-    linear-gradient(90deg,  rgba(180,159,204,.5) 1px, transparent 1px),
+    linear-gradient(90deg, var(--web-color) 1px, transparent 1px),
     linear-gradient(158deg, rgba(255,255,255,.6) 1px, transparent 1px),
     linear-gradient(170deg, rgba(255,255,255,.975) 1px, transparent 1px);
 }
-
 .web::after {
   background:
-    radial-gradient(circle at 0 0, transparent 30px,  rgba(180,159,204,.5) 31px, transparent 32px),
-    radial-gradient(circle at 0 0, transparent 55px,  rgba(180,159,204,.4) 56px, transparent 57px),
-    radial-gradient(circle at 0 0, transparent 80px,  rgba(180,159,204,.35) 81px, transparent 82px),
-    radial-gradient(circle at 0 0, transparent 105px, rgba(180,159,204,.3) 106px, transparent 107px);
+    radial-gradient(circle at 0 0, transparent 30px, var(--web-color) 31px, transparent 32px),
+    radial-gradient(circle at 0 0, transparent 55px, var(--web-color) 56px, transparent 57px),
+    radial-gradient(circle at 0 0, transparent 80px, var(--web-color) 81px, transparent 82px),
+    radial-gradient(circle at 0 0, transparent 105px, var(--web-color) 106px, transparent 107px);
 }
 
-/* ─── RAMAS ──────────────────────────────────────────────
-   Antes: width:420px fijo → más ancho que móvil
-   Fix:   clamp para que se adapte                        */
+/* ================================================================
+   RAMAS
+   ================================================================ */
 .rama-tl {
-  position: fixed;
-  top: -10px;
-  left: -10px;
+  position: fixed; top: -10px; left: -10px;
   width: clamp(200px, 55vw, 420px);
-  pointer-events: none;
-  z-index: 4;
-  opacity: 0.92;
-  mix-blend-mode: screen;
+  pointer-events: none; z-index: 4; opacity: .92;
+  mix-blend-mode: screen; transition: filter 0.8s;
 }
-
 .rama-br {
-  position: fixed;
-  bottom: -10px;
-  right: -10px;
+  position: fixed; bottom: -10px; right: -10px;
   width: clamp(200px, 55vw, 420px);
-  pointer-events: none;
-  z-index: 4;
-  opacity: 0.92;
-  transform: rotate(180deg);
-  mix-blend-mode: screen;
+  pointer-events: none; z-index: 4; opacity: .92;
+  transform: rotate(180deg); mix-blend-mode: screen; transition: filter 0.8s;
+}
+body.otra-madre .rama-tl,
+body.otra-madre .rama-br {
+  filter: sepia(1) hue-rotate(-30deg) saturate(3) brightness(0.7);
 }
 
-/* ─── GATO ───────────────────────────────────────────────
-   Antes: width:220px fijo → muy grande en móvil
-   Fix:   clamp proporcional                              */
+/* ================================================================
+   GATO
+   ================================================================ */
 .gato-bl {
-  position: fixed;
-  bottom: 0;
-  left: 0;
+  position: fixed; bottom: 0; left: 0;
   width: clamp(120px, 35vw, 220px);
-  pointer-events: none;
-  z-index: 4;
-  mix-blend-mode: lighten;
+  pointer-events: none; z-index: 4;
+  mix-blend-mode: lighten; transition: filter 0.8s;
 }
+body.otra-madre .gato-bl {
+  filter: sepia(.5) hue-rotate(-20deg) saturate(2) brightness(.8);
+}
+
+/* ================================================================
+   OVERLAY — Otra Madre (viñeta roja)
+   ================================================================ */
+body::after {
+  content: ''; position: fixed; inset: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(80,0,0,.6) 100%);
+  pointer-events: none; z-index: 1;
+  opacity: 0; transition: opacity 0.8s ease;
+}
+body.otra-madre::after { opacity: 1; }

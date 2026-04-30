@@ -6,35 +6,48 @@
     <title>Happy Birthday</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="mundo-real">
     <canvas id="stars-canvas"></canvas>
-<img src="gato.png" class="gato-bl" alt="">
-<img src="rama.png"c class="rama-tl" alt="">
-<img src="rama.png"c class="rama-br" alt="">
-<div class="spider-wrap">
+
+    <div class="toggle-wrap">
+      <span class="toggle-label" id="lbl-real">Mundo Real</span>
+      <button class="toggle-btn" id="toggle-btn" onclick="toggleWorld()" aria-label="Cambiar mundo">
+        <div class="toggle-knob">
+          <div class="boton-dot"></div>
+        </div>
+      </button>
+      <span class="toggle-label" id="lbl-otra">Otra Madre</span>
+    </div>
+
+    <img src="gato.png" class="gato-bl" alt="">
+    <img src="rama.png" class="rama-tl" alt="">
+    <img src="rama.png" class="rama-br" alt="">
+    <div class="spider-wrap">
       <div class="thread"></div>
-      <div class="spider">🕷️</div> 
+      <div class="spider">🕷️</div>
     </div>
     <div class="moon">
-      <div class="moon-eyes">
-        <div class="eye">
-          <div class="pupil"></div>
-        </div>
-        <div class="eye">
-          <div class="pupil"></div>
-        </div>
+      <div class="moon-eyes" id="moon-eyes">
+        <div class="eye"><div class="pupil"></div></div>
+        <div class="eye"><div class="pupil"></div></div>
       </div>
+
+      <div class="button-eyes" id="button-eyes">
+        <div class="button-eye"><div class="button-pupil"></div></div>
+        <div class="button-eye"><div class="button-pupil"></div></div>
+      </div>
+
     </div>
     <div class="web web-left"></div>
     <div class="web web-right"></div>
     <div class="velas">
-    <div class="fuego"></div>
-    <div class="fuego"></div>
-    <div class="fuego"></div>
-    <div class="fuego"></div>
-    <div class="fuego"></div>
-</div>
-<svg id="cake" version="1.1" x="0px" y="0px" width="200px" height="500px" viewBox="0 0 200 500" enable-background="new 0 0 200 500" xml:space="preserve">
+      <div class="fuego"></div>
+      <div class="fuego"></div>
+      <div class="fuego"></div>
+      <div class="fuego"></div>
+      <div class="fuego"></div>
+    </div>
+      <svg id="cake" version="1.1" x="0px" y="0px" width="200px" height="500px" viewBox="0 0 200 500" enable-background="new 0 0 200 500" xml:space="preserve">
     <path fill="#a88679" d="M173.667-13.94c-49.298,0-102.782,0-147.334,0c-3.999,0-4-16.002,0-16.002
 		c44.697,0,96.586,0,147.334,0C177.667-29.942,177.668-13.94,173.667-13.94z">
         <animate id="bizcocho_3" attributeName="d" calcMode="spline" keySplines="0 0 1 1; 0 0 1 1" begin="relleno_2.end" dur="0.3s" fill="freeze" values="
@@ -182,11 +195,15 @@
     </path>
     <rect x="10" y="475.571" fill="#fefae9" width="180" height="4" />
 </svg>
-<div class="text">
-  <h1>✦ From the Other Side ✦</h1>
-  <p id="msg"></p>
-</div>
-<script src="main.js"></script>
-  <div class="fog"></div>
+    <div class="text">
+      <h1 class="titulo-mundo-real">✦ From the Other Side ✦</h1>
+      <h1 class="titulo-otra-madre">✦ They Will Be Mine ✦</h1>
+      <p id="msg"></p>
+    </div>
+    <script src="main.js"></script>
+    <div class="fog"></div>
 </body>
 </html>
+
+
+
