@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terjeta de Felicitacion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: #080810;
+    }
+
+    /* ── CANVAS ESTRELLAS ── */
+    #stars-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── DECORACIÓN ── */
+    .web-corner {
+      position: fixed;
+      width: clamp(70px, 18vw, 120px);
+      height: clamp(70px, 18vw, 120px);
+      pointer-events: none;
+      opacity: 0.4;
+      z-index: 2;
+    }
+    .web-corner.tl { top: 0; left: 0; }
+    .web-corner.tr { top: 0; right: 0; transform: scaleX(-1); }
+    .web-corner.bl { bottom: 0; left: 0; transform: scaleY(-1); }
+    .web-corner.br { bottom: 0; right: 0; transform: scale(-1, -1); }
+
+    .vignette {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 30%, rgba(4, 4, 14, 0.72) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .fog {
+      position: fixed;
+      bottom: 0; left: 0;
+      width: 100%; height: 40%;
+      background: linear-gradient(to top, rgba(100, 70, 160, 0.15) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ── LUCIÉRNAGAS ── */
+    .firefly {
+      position: fixed;
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: #f5e642;
+      box-shadow: 0 0 6px 3px rgba(245, 230, 66, 0.55);
+      pointer-events: none;
+      z-index: 1;
+      animation: drift linear infinite;
+    }
+    @keyframes drift {
+      0%   { transform: translate(0, 0) scale(1); opacity: 0; }
+      20%  { opacity: 1; }
+      80%  { opacity: 0.8; }
+      100% { transform: translate(var(--dx), var(--dy)) scale(0.3); opacity: 0; }
+    }
+
+    /* ── ESCENA CENTRAL ── */
+    .scene {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .intro-title {
+      font-family: 'Cinzel Decorative', cursive;
+      font-size: clamp(0.8rem,3vw, 1rem);
+      letter-spacing: 5px;
+      color: #7a6a9a;
+      text-transform: uppercase;
+      margin-bottom: clamp(28px, 5vh, 48px);
+      opacity: 0;
+      animation: fadeUp 1s 0.5s ease forwards;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── PUERTA ── */
+    .door-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      perspective: 800px;
+    }
+
+    .door-frame {
+      width: clamp(110px, 22vw, 150px);
+      height: clamp(180px, 36vw, 240px);
+      background: #1a0f2e;
+      border: 3px solid #3d2a5a;
+      border-radius: 50% 50% 0 0 / 30% 30% 0 0;
+      position: relative;
+      box-shadow:
+        0 0 30px rgba(120, 70, 200, 0.18),
+        inset 0 0 20px rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+      overflow: hidden;
+      transform-style: preserve-3d;
+    }
+
+    /* Brillo interior visible al abrir */
+    .door-glow {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(ellipse at 50% 55%, rgba(180, 140, 255, 0.0) 0%, transparent 70%);
+      transition: background 0.8s ease;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Hoja de la puerta */
+    .door-panel {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, #251641 0%, #1a0f2e 50%, #100820 100%);
+      border-radius: inherit;
+      transform-origin: left center;
+      transition: transform 1.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-right: 2px solid #3d2a5a;
+      z-index: 2;
+    }
+
+    /* Marco interior de la puerta */
+    .door-panel::before {
+      content: '';
+      position: absolute;
+      inset: 10px;
+      border: 1px solid rgba(100, 70, 160, 0.3);
+      border-radius: 42% 42% 0 0 / 22% 22% 0 0;
+    }
+
+    /* Moldura inferior */
+    .door-panel::after {
+      content: '';
+      position: absolute;
+      left: 50%; top: 32%;
+      transform: translateX(-50%);
+      width: 78%; height: 42%;
+      border: 1px solid rgba(100, 70, 160, 0.2);
+      border-radius: 4px;
+    }
+
+    /* Pomo */
+    .door-knob {
+      position: absolute;
+      right: clamp(14px, 4%, 20px);
+      top: 50%;
+      transform: translateY(-50%);
+      width: clamp(10px, 2vw, 14px);
+      height: clamp(10px, 2vw, 14px);
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #c9a84c, #7a5a1a);
+      box-shadow: 0 0 6px rgba(201, 168, 76, 0.5);
+      transition: box-shadow 0.35s;
+      z-index: 3;
+    }
+
+    .door-frame:hover .door-knob {
+      box-shadow: 0 0 16px rgba(201, 168, 76, 0.95);
+    }
+
+    /* Araña colgante */
+    .door-spider {
+      position: absolute;
+      top: 14px; left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(11px, 2.5vw, 16px);
+      opacity: 0.65;
+      animation: spiderSway 3s ease-in-out infinite;
+      z-index: 3;
+    }
+    @keyframes spiderSway {
+      0%, 100% { transform: translateX(-50%) rotate(-6deg); }
+      50%       { transform: translateX(-50%) rotate(6deg); }
+    }
+
+    /* Escalón */
+    .door-step {
+      width: calc(clamp(110px, 22vw, 150px) + 26px);
+      height: 14px;
+      background: #1a0f2e;
+      border: 2px solid #3d2a5a;
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55);
+    }
+
+    /* Hint */
+    .open-hint {
+      margin-top: clamp(20px, 4vh, 36px);
+      font-family: 'Cinzel Decorative', cursive;
+      font-size: clamp(0.42rem, 1.5vw, 0.58rem);
+      letter-spacing: 4px;
+      color: #5a4a7a;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeUp 1s 1.3s ease forwards, blink 2.8s 2.5s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 0.45; }
+      50%       { opacity: 1; }
+    }
+
+    /* ── ESTADO: ABIERTA ── */
+    .door-frame.open .door-panel {
+      transform: perspective(700px) rotateY(-78deg);
+    }
+    .door-frame.open .door-glow {
+      background: radial-gradient(ellipse at 50% 50%, rgba(190, 150, 255, 0.4) 0%, transparent 75%);
+    }
+
+    /* ── OVERLAY DE TRANSICIÓN ── */
+    #overlay {
+      position: fixed;
+      inset: 0;
+      background: #0a0a1a;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 100;
+      transition: opacity 0.9s ease;
+    }
+    #overlay.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <canvas id="stars-canvas"></canvas>
+
+  <!-- Telarañas en esquinas -->
+  <svg class="web-corner tl" viewBox="0 0 120 120">
+    <line x1="0" y1="0" x2="120" y2="120" stroke="rgba(180,159,204,0.55)" stroke-width="0.7"/>
+    <line x1="0" y1="0" x2="85"  y2="120" stroke="rgba(180,159,204,0.5)"  stroke-width="0.7"/>
+    <line x1="0" y1="0" x2="120" y2="65"  stroke="rgba(180,159,204,0.45)" stroke-width="0.7"/>
+    <line x1="0" y1="0" x2="55"  y2="120" stroke="rgba(180,159,204,0.35)" stroke-width="0.5"/>
+    <circle cx="0" cy="0" r="30"  fill="none" stroke="rgba(180,159,204,0.4)"  stroke-width="0.6"/>
+    <circle cx="0" cy="0" r="58"  fill="none" stroke="rgba(180,159,204,0.3)"  stroke-width="0.6"/>
+    <circle cx="0" cy="0" r="86"  fill="none" stroke="rgba(180,159,204,0.22)" stroke-width="0.5"/>
+    <circle cx="0" cy="0" r="114" fill="none" stroke="rgba(180,159,204,0.15)" stroke-width="0.5"/>
+  </svg>
+  <svg class="web-corner tr" viewBox="0 0 120 120">
+    <line x1="0" y1="0" x2="120" y2="120" stroke="rgba(180,159,204,0.55)" stroke-width="0.7"/>
+    <line x1="0" y1="0" x2="85"  y2="120" stroke="rgba(180,159,204,0.5)"  stroke-width="0.7"/>
+    <line x1="0" y1="0" x2="120" y2="65"  stroke="rgba(180,159,204,0.45)" stroke-width="0.7"/>
+    <line x1="0" y1="0" x2="55"  y2="120" stroke="rgba(180,159,204,0.35)" stroke-width="0.5"/>
+    <circle cx="0" cy="0" r="30"  fill="none" stroke="rgba(180,159,204,0.4)"  stroke-width="0.6"/>
+    <circle cx="0" cy="0" r="58"  fill="none" stroke="rgba(180,159,204,0.3)"  stroke-width="0.6"/>
+    <circle cx="0" cy="0" r="86"  fill="none" stroke="rgba(180,159,204,0.22)" stroke-width="0.5"/>
+    <circle cx="0" cy="0" r="114" fill="none" stroke="rgba(180,159,204,0.15)" stroke-width="0.5"/>
+  </svg>
+
+  <div class="vignette"></div>
+  <div class="fog"></div>
+
+  <!-- Araña colgante (decoración extra) -->
+  <div style="position:fixed;top:0;left:28%;z-index:3;pointer-events:none;animation:spiderDrop2 16s ease-in-out infinite;">
+    <div style="width:1px;height:200px;background:linear-gradient(to bottom,transparent,rgba(180,159,204,0.35));margin:0 auto;"></div>
+    <div style="text-align:center;font-size:18px;filter:drop-shadow(0 0 4px rgba(180,159,204,0.5));">🕷️</div>
+  </div>
+
+  <div class="scene">
+    <p class="intro-title">✦ Una Puerta Pequeña ✦</p>
+
+    <div class="door-wrap">
+      <div class="door-frame" id="door" onclick="abrirPuerta()">
+        <div class="door-glow"></div>
+        <div class="door-panel">
+          <div class="door-spider">⚉</div>
+          <div class="door-knob"></div>
+        </div>
+      </div>
+      <div class="door-step"></div>
+    </div>
+
+    <p class="open-hint">— toca para entrar —</p>
+  </div>
+
+  <div id="overlay"></div>
+
+  <script>
+    /* ── ESTRELLAS ── */
+    (function () {
+      const canvas = document.getElementById('stars-canvas');
+      const ctx    = canvas.getContext('2d');
+      let W, H, stars = [];
+
+      function resize() {
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+
+      function initStars() {
+        stars = Array.from({ length: 180 }, () => ({
+          x:  Math.random() * W,
+          y:  Math.random() * H,
+          r:  Math.random() * 1.4 + 0.3,
+          a:  Math.random(),
+          da: (Math.random() * 0.005 + 0.002) * (Math.random() < 0.5 ? 1 : -1)
+        }));
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        stars.forEach(s => {
+          s.a += s.da;
+          if (s.a > 1 || s.a < 0) s.da *= -1;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(240,237,228,${s.a})`;
+          ctx.fill();
+        });
+        requestAnimationFrame(draw);
+      }
+
+      resize(); initStars(); draw();
+      window.addEventListener('resize', () => { resize(); initStars(); });
+    })();
+
+    /* ── LUCIÉRNAGAS ── */
+    for (let i = 0; i < 18; i++) {
+      const f = document.createElement('div');
+      f.className = 'firefly';
+      f.style.cssText = `
+        left: ${Math.random() * 100}%;
+        top:  ${Math.random() * 100}%;
+        --dx: ${(Math.random() * 200 - 100).toFixed(0)}px;
+        --dy: ${(Math.random() * 200 - 100).toFixed(0)}px;
+        animation-duration: ${(Math.random() * 8 + 5).toFixed(1)}s;
+        animation-delay:    ${(Math.random() * 5).toFixed(1)}s;
+      `;
+      document.body.appendChild(f);
+    }
+
+    /* ── ABRIR PUERTA Y REDIRIGIR ── */
+    function abrirPuerta() {
+      const door    = document.getElementById('door');
+      const overlay = document.getElementById('overlay');
+      if (door.classList.contains('open')) return;
+
+      door.classList.add('open');
+
+      /* Fade out hacia index.html */
+      setTimeout(() => overlay.classList.add('show'), 950);
+      setTimeout(() => {
+        sessionStorage.setItem('entered', '1');
+        window.location.href = 'index.html';
+      }, 1900);
+    }
+
+    /* animación extra araña */
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes spiderDrop2 {
+        0%   { transform: translateY(-80px); }
+        35%  { transform: translateY(160px); }
+        65%  { transform: translateY(100px); }
+        85%  { transform: translateY(220px); }
+        100% { transform: translateY(-80px); }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>

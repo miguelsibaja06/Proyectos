@@ -216,3 +216,8 @@ setInterval(() => {
     setTimeout(() => buttonEyes.forEach(e => e.classList.remove("blink-btn")), 150);
   }
 }, 4000);
+
+// Limpiar 'entered' al cerrar/recargar la página
+window.addEventListener('beforeunload', () => {
+  sessionStorage.removeItem('entered');
+});
