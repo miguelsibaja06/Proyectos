@@ -1,0 +1,326 @@
+@import url('https://fonts.googleapis.com/css2?family=Playwrite+NO:wght@100..400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&display=swap');
+    
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  background: #0a0a1a;
+}
+
+#cake {
+  display: block;
+  position: relative;
+  margin: -10em auto 0 auto;
+}
+
+.velas {
+  background: #fbfbfb;
+  border-radius: 10px;
+  position: absolute;
+  top: 228px;
+  left: 50%;
+  margin-left: -2.4px;
+  margin-top: -8.33333333px;
+  width: 5px;
+  height: 35px;
+  transform: translateY(-300px);
+  backface-visibility: hidden;
+  animation: in 500ms 6s ease-out forwards;
+}
+.velas:after,
+.velas:before {
+  background :#c8d9e0 (0, 255, 0, 0.4);
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 2.22222222px;
+}
+.velas:after {
+  top: 25%;
+  left: 0;
+}
+.velas:before {
+  top: 45%;
+  left: 0;
+}
+
+.fuego {
+  border-radius: 100%;
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  margin-left: -4.6px;
+  width: 8.66666667px;
+  height: 28px;
+}
+.fuego:nth-child(1) { animation: fuego 2s 6.5s infinite; }
+.fuego:nth-child(2) { animation: fuego 1.5s 6.5s infinite; }
+.fuego:nth-child(3) { animation: fuego 1s 6.5s infinite; }
+.fuego:nth-child(4) { animation: fuego 0.5s 6.5s infinite; }
+.fuego:nth-child(5) { animation: fuego 0.2s 6.5s infinite; }
+
+
+@keyframes fuego {
+  0%, 100% {
+    background: rgba(254, 248, 97, 0.5);
+    box-shadow: 0 0 40px 10px rgba(248, 233, 209, 0.2);
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    background: rgba(255, 50, 0, 0.1);
+    box-shadow: 0 0 40px 20px rgba(248, 233, 209, 0.2);
+    transform: translateY(-20px) scale(0);
+  }
+}
+
+@keyframes in {
+  to {
+    transform: translateY(0);
+  }
+}
+
+.text {
+  text-align: center;
+}
+
+.text h1 {
+  font-family: 'Cinzel Decorative', cursive;
+  font-size: 1rem;
+  letter-spacing: 3px;
+  color: #b49fcc;
+  text-shadow: 0 0 12px rgba(180,159,204,.7);
+  margin-bottom: 10px;
+}
+
+#msg {
+  font-family: 'Cinzel Decorative', cursive;
+  font-size: clamp(1rem, 4vw, 1.8rem);
+  color: #f5e642;
+  text-shadow: 0 0 16px rgba(245,230,66,.8);
+
+  border-right: 2px solid #c9a84c;
+
+  white-space: normal;       /* 🔥 clave */
+  word-break: break-word;    /* 🔥 clave */
+  text-align: center;
+  padding: 0 10px;
+  display: inline-block;
+}
+
+/* 🎊 CONFETI */
+.confeti {
+  position: fixed;
+  top: -20px;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+@keyframes caer {
+  to {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+#stars-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.spider-wrap {
+  position: fixed;
+  top: 0;
+  left: 25%;
+  transform: translateX(-25%);
+  pointer-events: none;
+  z-index: 10;
+  animation: spiderDrop 14s ease-in-out infinite;
+}
+
+@keyframes spiderDrop {
+  0%   { transform: translateX(-25%) translateY(-60px); }  /* arriba escondida */
+  30%  { transform: translateX(-25%) translateY(120px); }  /* baja */
+  60%  { transform: translateX(-25%) translateY(80px);  }  /* sube un poco */
+  80%  { transform: translateX(-25%) translateY(200px); }  /* baja más */
+  100% { transform: translateX(-25%) translateY(-60px); }  /* sube y desaparece */
+}
+
+.thread {
+  width: 1px;
+  height: 260px;
+  background: linear-gradient(to bottom, transparent, rgba(180,159,204,.6));
+  margin: 0 auto;
+}
+
+.spider {
+  font-size: 20px;
+  text-align: center;
+  filter: drop-shadow(0 0 4px rgba(180,159,204,.8));
+}
+
+.firefly {
+  position: fixed;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #f5e642;
+  box-shadow: 0 0 6px 3px rgba(245,230,66,.6);
+  pointer-events: none;
+  z-index: 1;
+  animation: drift linear infinite;
+}
+
+@keyframes drift {
+  0%   { transform: translate(0,0) scale(1); opacity: 0; }
+  20%  { opacity: 1; }
+  80%  { opacity: .8; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0.3); opacity: 0; }
+}
+
+.fog {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: linear-gradient(
+    to top,
+    rgba(180,159,204, 0.2) 0%,    /* teal de Coraline abajo */
+    rgba(10, 10, 26, 0.15) 60%,     /* azul oscuro en medio */
+    transparent 100%                 /* desaparece arriba */
+  );
+  pointer-events: none;
+  z-index: 5;
+}
+
+.moon {
+  position: fixed;
+  top: 40px;
+  right: 80px;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: #f5e8a0; /* luna llena */
+  box-shadow: 0 0 25px rgba(245,232,160,.6);
+  z-index: 3;
+  animation: moonGlow 4s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.moon-eyes {
+  display: flex;
+  gap: 12px;
+}
+
+.moon-eyes {
+  opacity: 0;
+  animation: aparecerOjos 3s ease-in-out 2s forwards;
+}
+
+.moon .eye {
+  display: flex;
+  gap: 12px;
+  width: 18px;
+  height: 18px;
+  background: #0a0a1a;
+  border-radius: 50%;
+  position: relative;
+}
+
+.moon .pupil {
+  width: 6px;
+  height: 6px;
+  background: #f5e642;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes moonGlow {
+  0%, 100% { filter: drop-shadow(0 0 18px rgba(245,232,160,.5)); }
+  50%       { filter: drop-shadow(0 0 30px rgba(245,232,160,.8)); }
+}
+
+.web {
+  position: fixed;
+  top: 0;
+  width: 120px;
+  height: 120px;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 1;
+}
+
+.web-left  { left: 0; }
+.web-right { right: 0; transform: scaleX(-1); } /* espejo */
+
+/* hilos que salen de la esquina */
+.web::before,
+.web::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    /* hilos diagonales */
+    linear-gradient(135deg, rgb(254, 254, 254) 1px, transparent 1px),
+    linear-gradient(112deg, rgb(255, 255, 255) 1px, transparent 1px),
+    linear-gradient(90deg,  rgba(180,159,204,.5) 1px, transparent 1px),
+    linear-gradient(158deg, rgba(255, 255, 255, 0.6) 1px, transparent 1px),
+    linear-gradient(170deg, rgba(255, 255, 255, 0.975) 1px, transparent 1px);
+}
+
+/* arcos de la telaraña */
+.web::after {
+  background:
+    radial-gradient(circle at 0 0, transparent 30px,  rgba(180,159,204,.5) 31px, transparent 32px),
+    radial-gradient(circle at 0 0, transparent 55px,  rgba(180,159,204,.4) 56px, transparent 57px),
+    radial-gradient(circle at 0 0, transparent 80px,  rgba(180,159,204,.35) 81px, transparent 82px),
+    radial-gradient(circle at 0 0, transparent 105px, rgba(180,159,204,.3) 106px, transparent 107px);
+}
+
+
+
+.rama-tl {
+  position: fixed;
+  top: -10px;
+  left: -10px;
+  width: 420px;
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0.92;
+  mix-blend-mode: screen; /* ← el negro del fondo desaparece, solo quedan las ramas */
+}
+
+.rama-br {
+  position: fixed;
+  bottom: -10px;
+  right: -10px;
+  width: 420px;
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0.92;
+  transform: rotate(180deg);
+  mix-blend-mode: screen; /* ← igual que rama-tl, mismo truco */
+}
+
+.gato-bl {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 220px;
+  pointer-events: none;
+  z-index: 4;
+  mix-blend-mode:  lighten; /* elimina el fondo negro igual que las ramas */
+}
