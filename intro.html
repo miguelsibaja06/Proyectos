@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Terjeta de Felicitacion</title>
+  <title>Puerta al Túnel</title>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -14,7 +14,7 @@
       background: #080810;
     }
 
-    /* ── CANVAS ESTRELLAS ── */
+    /* ── CANVAS ESTRELLAS (fondo) ── */
     #stars-canvas {
       position: fixed;
       inset: 0;
@@ -53,7 +53,7 @@
       z-index: 1;
     }
 
-    /* ── LUCIÉRNAGAS ── */
+    /* ── LUCIÉRNAGAS (fondo) ── */
     .firefly {
       position: fixed;
       width: 4px; height: 4px;
@@ -71,7 +71,7 @@
       100% { transform: translate(var(--dx), var(--dy)) scale(0.3); opacity: 0; }
     }
 
-    /* ── ESCENA CENTRAL ── */
+    /* ── ESCENA CENTRAL (puerta) ── */
     .scene {
       position: fixed;
       inset: 0;
@@ -80,6 +80,11 @@
       align-items: center;
       justify-content: center;
       z-index: 10;
+      transition: opacity 0.8s ease;
+    }
+    .scene.fade-out {
+      opacity: 0;
+      pointer-events: none;
     }
 
     .intro-title {
@@ -98,7 +103,7 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ── PUERTA ── */
+    /* Puerta */
     .door-wrap {
       display: flex;
       flex-direction: column;
@@ -113,15 +118,12 @@
       border: 3px solid #3d2a5a;
       border-radius: 50% 50% 0 0 / 30% 30% 0 0;
       position: relative;
-      box-shadow:
-        0 0 30px rgba(120, 70, 200, 0.18),
-        inset 0 0 20px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 0 30px rgba(120, 70, 200, 0.18), inset 0 0 20px rgba(0, 0, 0, 0.5);
       cursor: pointer;
       overflow: hidden;
       transform-style: preserve-3d;
     }
 
-    /* Brillo interior visible al abrir */
     .door-glow {
       position: absolute;
       inset: 0;
@@ -132,7 +134,6 @@
       z-index: 1;
     }
 
-    /* Hoja de la puerta */
     .door-panel {
       position: absolute;
       inset: 0;
@@ -144,7 +145,6 @@
       z-index: 2;
     }
 
-    /* Marco interior de la puerta */
     .door-panel::before {
       content: '';
       position: absolute;
@@ -153,7 +153,6 @@
       border-radius: 42% 42% 0 0 / 22% 22% 0 0;
     }
 
-    /* Moldura inferior */
     .door-panel::after {
       content: '';
       position: absolute;
@@ -164,7 +163,6 @@
       border-radius: 4px;
     }
 
-    /* Pomo */
     .door-knob {
       position: absolute;
       right: clamp(14px, 4%, 20px);
@@ -183,7 +181,6 @@
       box-shadow: 0 0 16px rgba(201, 168, 76, 0.95);
     }
 
-    /* Araña colgante */
     .door-spider {
       position: absolute;
       top: 14px; left: 50%;
@@ -193,12 +190,12 @@
       animation: spiderSway 3s ease-in-out infinite;
       z-index: 3;
     }
+
     @keyframes spiderSway {
       0%, 100% { transform: translateX(-50%) rotate(-6deg); }
       50%       { transform: translateX(-50%) rotate(6deg); }
     }
 
-    /* Escalón */
     .door-step {
       width: calc(clamp(110px, 22vw, 150px) + 26px);
       height: 14px;
@@ -209,23 +206,23 @@
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55);
     }
 
-    /* Hint */
     .open-hint {
       margin-top: clamp(20px, 4vh, 36px);
       font-family: 'Cinzel Decorative', cursive;
-      font-size: clamp(0.42rem, 1.5vw, 0.58rem);
+      font-size: clamp(0.50rem, 1.8vw, 0.60rem);
       letter-spacing: 4px;
       color: #5a4a7a;
       text-transform: uppercase;
       opacity: 0;
       animation: fadeUp 1s 1.3s ease forwards, blink 2.8s 2.5s ease-in-out infinite;
     }
+
     @keyframes blink {
       0%, 100% { opacity: 0.45; }
       50%       { opacity: 1; }
     }
 
-    /* ── ESTADO: ABIERTA ── */
+    /* Estado abierta */
     .door-frame.open .door-panel {
       transform: perspective(700px) rotateY(-78deg);
     }
@@ -233,24 +230,47 @@
       background: radial-gradient(ellipse at 50% 50%, rgba(190, 150, 255, 0.4) 0%, transparent 75%);
     }
 
-    /* ── OVERLAY DE TRANSICIÓN ── */
-    #overlay {
+    /* ── CANVAS DEL TÚNEL (inicialmente invisible) ── */
+    #tunnel-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 20;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+      pointer-events: none;
+    }
+    #tunnel-canvas.visible {
+      opacity: 1;
+    }
+
+    /* Overlay de oscurecimiento sutil para la transición (opcional) */
+    .transition-overlay {
       position: fixed;
       inset: 0;
-      background: #0a0a1a;
+      background: black;
+      z-index: 15;
       opacity: 0;
       pointer-events: none;
-      z-index: 100;
-      transition: opacity 0.9s ease;
+      transition: opacity 0.8s ease;
     }
-    #overlay.show { opacity: 1; }
+    .transition-overlay.active {
+      opacity: 0.5;
+    }
+    * { cursor: none !important; }
   </style>
 </head>
 <body>
 
+  <!-- Fondo de estrellas -->
   <canvas id="stars-canvas"></canvas>
-
-  <!-- Telarañas en esquinas -->
+    <audio id="musica-fondo" loop>
+      <source src="audio.mp3" type="audio/mpeg">
+    </audio>
+  <!-- Telarañas decorativas -->
   <svg class="web-corner tl" viewBox="0 0 120 120">
     <line x1="0" y1="0" x2="120" y2="120" stroke="rgba(180,159,204,0.55)" stroke-width="0.7"/>
     <line x1="0" y1="0" x2="85"  y2="120" stroke="rgba(180,159,204,0.5)"  stroke-width="0.7"/>
@@ -275,15 +295,15 @@
   <div class="vignette"></div>
   <div class="fog"></div>
 
-  <!-- Araña colgante (decoración extra) -->
+  <!-- Araña decorativa extra -->
   <div style="position:fixed;top:0;left:28%;z-index:3;pointer-events:none;animation:spiderDrop2 16s ease-in-out infinite;">
     <div style="width:1px;height:200px;background:linear-gradient(to bottom,transparent,rgba(180,159,204,0.35));margin:0 auto;"></div>
     <div style="text-align:center;font-size:18px;filter:drop-shadow(0 0 4px rgba(180,159,204,0.5));">🕷️</div>
   </div>
 
-  <div class="scene">
+  <!-- Escena de la puerta -->
+  <div class="scene" id="scene">
     <p class="intro-title">✦ Una Puerta Pequeña ✦</p>
-
     <div class="door-wrap">
       <div class="door-frame" id="door" onclick="abrirPuerta()">
         <div class="door-glow"></div>
@@ -294,14 +314,26 @@
       </div>
       <div class="door-step"></div>
     </div>
-
     <p class="open-hint">— toca para entrar —</p>
   </div>
 
-  <div id="overlay"></div>
-
+  <!-- Canvas del túnel (inicialmente oculto) -->
+  <canvas id="tunnel-canvas"></canvas>
+  <div class="transition-overlay" id="transitionOverlay"></div>
+  <div id="finalFade" style="
+  position: fixed;
+  inset: 0;
+  background: black;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  pointer-events: none;
+"></div>
+  
   <script>
-    /* ── ESTRELLAS ── */
+    /* ==========================
+       ESTRELLAS (fondo)
+    ========================== */
     (function () {
       const canvas = document.getElementById('stars-canvas');
       const ctx    = canvas.getContext('2d');
@@ -339,13 +371,15 @@
       window.addEventListener('resize', () => { resize(); initStars(); });
     })();
 
-    /* ── LUCIÉRNAGAS ── */
+    /* ==========================
+       LUCIÉRNAGAS
+    ========================== */
     for (let i = 0; i < 18; i++) {
-      const f = document.createElement('div');
+      const f   = document.createElement('div');
       f.className = 'firefly';
       f.style.cssText = `
         left: ${Math.random() * 100}%;
-        top:  ${Math.random() * 100}%;
+        top: ${Math.random() * 100}%;
         --dx: ${(Math.random() * 200 - 100).toFixed(0)}px;
         --dy: ${(Math.random() * 200 - 100).toFixed(0)}px;
         animation-duration: ${(Math.random() * 8 + 5).toFixed(1)}s;
@@ -354,23 +388,207 @@
       document.body.appendChild(f);
     }
 
-    /* ── ABRIR PUERTA Y REDIRIGIR ── */
-    function abrirPuerta() {
-      const door    = document.getElementById('door');
-      const overlay = document.getElementById('overlay');
-      if (door.classList.contains('open')) return;
+    /* ==========================
+       TÚNEL (código adaptado de tunnel.js)
+    ========================== */
+    const tunnelCanvas = document.getElementById('tunnel-canvas');
+    let ctxTunnel, Wt, Ht, cx, cy;
+    let tunnelAnimationId = null;
+    let rings = [], t = 0;
 
-      door.classList.add('open');
+    function initTunnel() {
+      Wt = window.innerWidth;
+      Ht = window.innerHeight;
+      tunnelCanvas.width = Wt;
+      tunnelCanvas.height = Ht;
+      ctxTunnel = tunnelCanvas.getContext('2d');
+      cx = Wt / 2;
+      cy = Ht / 2;
 
-      /* Fade out hacia index.html */
-      setTimeout(() => overlay.classList.add('show'), 950);
-      setTimeout(() => {
-        sessionStorage.setItem('entered', '1');
-        window.location.href = 'index.html';
-      }, 1900);
+      const RINGS = 18;
+      rings = Array.from({ length: RINGS }, (_, i) => ({
+        z: i / RINGS,
+        phase: (i / RINGS) * Math.PI * 2
+      }));
     }
 
-    /* animación extra araña */
+    function easeInOut(x) {
+      return x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+    }
+
+    function drawRing(progress, phase) {
+      const p = (progress + 1) % 1;
+      const depth = easeInOut(p);
+      const r = 20 + depth * (Math.min(Wt, Ht) * 1.1);
+
+      const alpha = p < 0.12 ? p / 0.12 : p > 0.82 ? (1 - p) / 0.18 : 1;
+      if (alpha <= 0) return;
+
+      const wobble = 20 * (1 - depth);
+      const pts = 120;
+      const rot = phase + p * Math.PI * 1.1;
+
+      ctxTunnel.beginPath();
+      for (let i = 0; i <= pts; i++) {
+        const a = (i / pts) * Math.PI * 2;
+        const noise =
+          Math.sin(a * 7 + phase * 3 + t * 0.8) * wobble +
+          Math.sin(a * 13 + phase * 5 - t * 1.2) * wobble * 0.4;
+        const rx = r + noise;
+        const ry = r * 0.97 + noise * 0.7;
+        const x = cx + Math.cos(a + rot) * rx;
+        const y = cy + Math.sin(a + rot) * ry;
+        i === 0 ? ctxTunnel.moveTo(x, y) : ctxTunnel.lineTo(x, y);
+      }
+      ctxTunnel.closePath();
+
+      const t1 = depth;
+      const br = Math.round(30 + t1 * 25);
+      const bg = 0;
+      const pr = Math.round(80 + t1 * 50);
+      const pb = Math.round(80 + t1 * 40);
+
+      const grd = ctxTunnel.createRadialGradient(cx, cy, r * 0.3, cx, cy, r * 1.1);
+      grd.addColorStop(0, 'rgba(0,0,0,0)');
+      grd.addColorStop(0.45, `rgba(${br},${bg},255,${0.22 * alpha})`);
+      grd.addColorStop(0.62, `rgba(${pr},0,${pb},${0.2 * alpha})`);
+      grd.addColorStop(1, 'rgba(4,1,14,0)');
+
+      ctxTunnel.fillStyle = grd;
+      ctxTunnel.fill();
+
+      const sr = Math.round(80 + t1 * 120);
+      const sg = Math.round(30 + t1 * 60);
+      ctxTunnel.strokeStyle = `rgba(${sr},${sg},255,${0.3 * alpha})`;
+      ctxTunnel.lineWidth = 1.2 + depth * 1.5;
+      ctxTunnel.stroke();
+    }
+
+    function drawDoorOnTunnel() {
+      const dw = 22, dh = 36;
+      const x = cx - dw / 2, y = cy - dh / 2;
+      ctxTunnel.fillStyle = '#04010f';
+      ctxTunnel.beginPath();
+      // roundRect manual
+      const radius = 2;
+      ctxTunnel.moveTo(x + radius, y);
+      ctxTunnel.lineTo(x + dw - radius, y);
+      ctxTunnel.quadraticCurveTo(x + dw, y, x + dw, y + radius);
+      ctxTunnel.lineTo(x + dw, y + dh - radius);
+      ctxTunnel.quadraticCurveTo(x + dw, y + dh, x + dw - radius, y + dh);
+      ctxTunnel.lineTo(x + radius, y + dh);
+      ctxTunnel.quadraticCurveTo(x, y + dh, x, y + dh - radius);
+      ctxTunnel.lineTo(x, y + radius);
+      ctxTunnel.quadraticCurveTo(x, y, x + radius, y);
+      ctxTunnel.fill();
+
+      ctxTunnel.shadowColor = 'rgba(130,60,255,0.9)';
+      ctxTunnel.shadowBlur = 18;
+      ctxTunnel.strokeStyle = 'rgba(160,100,255,0.7)';
+      ctxTunnel.lineWidth = 1;
+      ctxTunnel.stroke();
+      ctxTunnel.shadowBlur = 0;
+    }
+
+    function animateTunnel(timestamp) {
+      if (!ctxTunnel) return;
+      t = timestamp * 0.001;
+      ctxTunnel.clearRect(0, 0, Wt, Ht);
+
+      const speed = 0.19;
+      rings.forEach(ring => {
+        const progress = ((ring.z + t * speed) % 1 + 1) % 1;
+        drawRing(progress, ring.phase);
+      });
+
+      drawDoorOnTunnel();
+      tunnelAnimationId = requestAnimationFrame(animateTunnel);
+    }
+
+    function startTunnel() {
+      if (tunnelAnimationId) cancelAnimationFrame(tunnelAnimationId);
+      initTunnel();
+      tunnelAnimationId = requestAnimationFrame(animateTunnel);
+    }
+
+    // Ajustar tamaño del túnel al redimensionar
+    window.addEventListener('resize', () => {
+      if (tunnelCanvas.classList.contains('visible')) {
+        initTunnel();
+      } else {
+        // Si no visible, solo actualizamos variables para cuando se muestre
+        Wt = window.innerWidth;
+        Ht = window.innerHeight;
+        if (ctxTunnel) {
+          tunnelCanvas.width = Wt;
+          tunnelCanvas.height = Ht;
+          cx = Wt / 2;
+          cy = Ht / 2;
+        }
+      }
+    });
+
+    /* ABRIR PUERTA Y MOSTRAR TÚNEL SUAVEMENTE */
+    let transitionStarted = false;
+    
+
+function abrirPuerta() {
+  if (transitionStarted) return;
+  transitionStarted = true;
+
+  const door = document.getElementById('door');
+  const scene = document.getElementById('scene');
+  const tunnelCanvasElem = document.getElementById('tunnel-canvas');
+  const overlay = document.getElementById('transitionOverlay');
+  const finalFade = document.getElementById('finalFade'); // nuevo elemento
+
+
+
+  //0.musica de fondo
+  const musica = document.getElementById('musica-fondo');
+  musica.volume = 0.4;
+  musica.play();
+  // 1. Abrir la puerta
+  door.classList.add('open');
+
+  // 2. Iniciar el túnel (invisible aún)
+  startTunnel();
+
+  // 3. Desvanecer escena y activar overlay de entrada
+  setTimeout(() => {
+    scene.classList.add('fade-out');
+    overlay.classList.add('active');
+  }, 300);
+
+  // 4. Mostrar túnel
+  setTimeout(() => {
+    tunnelCanvasElem.classList.add('visible');
+  }, 600);
+
+  // 5. Después de que el túnel se vea, ocultar el overlay de entrada para que no moleste
+  setTimeout(() => {
+    overlay.classList.remove('active');
+  }, 2000); // a los 2 segundos (ajustable)
+
+  // 6. Antes de redirigir, activar el FADE OUT con el nuevo elemento
+  setTimeout(() => {
+    finalFade.style.opacity = '1';   // comienza el oscurecimiento suave
+  }, 4300); // 4.3 segundos después de abrir
+
+  // 7. Redirigir cuando el fade lleve un rato
+  setTimeout(() => {
+    if (tunnelAnimationId) {
+      cancelAnimationFrame(tunnelAnimationId);
+      tunnelAnimationId = null;
+    }
+    const musica = document.getElementById('musica-fondo');
+    sessionStorage.setItem('musicaTime', musica.currentTime);
+    sessionStorage.setItem('entered', '1');
+    window.location.href = 'index.html';
+  }, 5400); // 5.4 segundos (1.1 segundos de fade antes de cambiar)
+}
+
+    // Animación de la araña extra
     const style = document.createElement('style');
     style.textContent = `
       @keyframes spiderDrop2 {
@@ -381,6 +599,68 @@
         100% { transform: translateY(-80px); }
       }
     `;
+/* ================================================================
+   CURSOR PERSONALIZADO — aguja con hilo
+   ================================================================ */
+const cursorAguja = document.createElement('div');
+cursorAguja.id = 'cursor-aguja';
+cursorAguja.innerHTML = '🪡';
+cursorAguja.style.cssText = `
+  position: fixed;
+  font-size: 22px;
+  pointer-events: none;
+  z-index: 99999;
+  transform: rotate(90deg);
+  transition: transform 0.1s ease;
+  filter: drop-shadow(0 0 4px rgba(180, 140, 255, 0.8));
+`;
+const hiloCanvas = document.createElement('canvas');
+hiloCanvas.id = 'hilo-canvas';
+hiloCanvas.style.cssText = `
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99998;
+`;
+hiloCanvas.width  = window.innerWidth;
+hiloCanvas.height = window.innerHeight;
+document.body.appendChild(hiloCanvas);
+const hiloCtx = hiloCanvas.getContext('2d');
+
+window.addEventListener('resize', () => {
+  hiloCanvas.width  = window.innerWidth;
+  hiloCanvas.height = window.innerHeight;
+});
+document.body.appendChild(cursorAguja);
+
+const puntos = [];
+const MAX_PUNTOS = 35;
+
+document.addEventListener('mousemove', e => {
+  cursorAguja.style.left = (e.clientX - 8) + 'px';
+  cursorAguja.style.top  = (e.clientY - 8) + 'px';
+
+  puntos.push({ x: e.clientX, y: e.clientY });
+  if (puntos.length > MAX_PUNTOS) puntos.shift();
+
+  hiloCtx.clearRect(0, 0, hiloCanvas.width, hiloCanvas.height);
+
+  if (puntos.length < 2) return;
+
+  hiloCtx.beginPath();
+  hiloCtx.moveTo(puntos[0].x, puntos[0].y);
+
+  for (let i = 1; i < puntos.length - 1; i++) {
+    const mx = (puntos[i].x + puntos[i + 1].x) / 2;
+    const my = (puntos[i].y + puntos[i + 1].y) / 2;
+    hiloCtx.quadraticCurveTo(puntos[i].x, puntos[i].y, mx, my);
+  }
+
+  hiloCtx.strokeStyle = 'rgba(180, 140, 255, 0.7)';
+  hiloCtx.lineWidth   = 1.5;
+  hiloCtx.lineCap     = 'round';
+  hiloCtx.stroke();
+});
     document.head.appendChild(style);
   </script>
 </body>

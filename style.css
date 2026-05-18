@@ -20,6 +20,10 @@ body.mundo-real {
   --titulo-shadow: rgba(180, 159, 204, .7);
   --msg-color:     #c9a84c;
   --msg-glow:      rgba(245, 230, 66, .8);
+  --cake-bizcocho:   #a88679;  
+  --cake-relleno:    #8b6a60;  
+  --cake-crema:      #C3B1E1;  
+  --cake-base-line:  #fefae9;
 }
 
 /* ================================================================
@@ -41,6 +45,10 @@ body.otra-madre {
   --titulo-shadow: rgba(245, 235, 224, .4);
   --msg-color:     #BAB8B5;   /* mensaje */
   --msg-glow:      rgba(245, 235, 224, .35);
+  --cake-bizcocho:   #4a251d;  
+  --cake-relleno:    #2b110c;  
+  --cake-crema:      #a61c1c;  
+  --cake-base-line:  #4d0f54;
 }
 
 /* ================================================================
@@ -122,10 +130,16 @@ body.otra-madre .toggle-knob { transform: translateX(26px); }
   display: block; position: relative;
   width: min(200px, 52vw); height: auto;
   margin: -10em auto 0 auto; overflow: hidden;
-  transition: filter 0.8s ease;
+  z-index: 6;
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), filter 0.8s ease;
+  filter: drop-shadow(0 0 12px rgba(180, 159, 204, 0.4));
 }
-body.otra-madre #cake { filter: sepia(0.4) hue-rotate(-30deg) saturate(1.5); }
 
+/* El efecto visual cuando se activa la Otra Madre */
+body.otra-madre #cake {
+  transform: scale(1.06); 
+  filter: drop-shadow(0 0 20px rgba(166, 28, 28, 0.85)); 
+}
 /* ================================================================
    VELAS
    ================================================================ */
@@ -144,6 +158,13 @@ body.otra-madre #cake { filter: sepia(0.4) hue-rotate(-30deg) saturate(1.5); }
 }
 .velas:after  { top: 25%; left: 0; }
 .velas:before { top: 45%; left: 0; }
+body.otra-madre .velas {
+  background: #321b15; /* Se vuelve un tono marrón/chocolate oscuro tétrico */
+}
+body.otra-madre .velas:after, 
+body.otra-madre .velas:before {
+  background: #501015; /* Las franjas decorativas mutan a un rojo vino opaco */
+}
 
 .fuego {
   border-radius: 100%; position: absolute;
@@ -170,10 +191,17 @@ body.otra-madre .fuego:nth-child(5) { animation: fuego-rojo 0.2s 6.5s infinite; 
   50%       { background: rgba(255,50,0,.1);  box-shadow: 0 0 40px 20px rgba(248,233,209,.2); transform: translateY(-20px) scale(0); }
 }
 @keyframes fuego-rojo {
-  0%, 100% { background: rgba(220,50,50,.7); box-shadow: 0 0 40px 10px rgba(180,30,30,.4); transform: translateY(0) scale(1); }
-  50%       { background: rgba(255,0,0,.2);  box-shadow: 0 0 40px 20px rgba(180,30,30,.3); transform: translateY(-20px) scale(0); }
+  0%, 100% { 
+    background: rgba(57, 255, 20, 0.7); /* Verde neón brillante */
+    box-shadow: 0 0 40px 10px rgba(46, 204, 113, 0.5); /* Resplandor neón */
+    transform: translateY(0) scale(1); 
+  }
+  50% { 
+    background: rgba(0, 255, 150, 0.2); /* Mutación a verde esmeralda pálido al encogerse */
+    box-shadow: 0 0 40px 20px rgba(46, 204, 113, 0.3); 
+    transform: translateY(-20px) scale(0); 
+  }
 }
-
 @keyframes in { to { transform: translateX(-50%) translateY(0); } }
 
 /* ================================================================
@@ -431,3 +459,11 @@ body::after {
   opacity: 0; transition: opacity 0.8s ease;
 }
 body.otra-madre::after { opacity: 1; }
+/* ── CURSOR PERSONALIZADO ── */
+* {
+  cursor: none !important;
+}
+/* Transición fluida para los rellenos internos de tu SVG */
+#cake path[fill], #cake rect[fill] {
+  transition: fill 0.8s ease-in-out;
+}

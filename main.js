@@ -3,13 +3,49 @@
    ================================================================ */
 function toggleWorld() {
   const body = document.body;
-  if (body.classList.contains('mundo-real')) {
-    body.classList.replace('mundo-real', 'otra-madre');
-  } else {
-    body.classList.replace('otra-madre', 'mundo-real');
-  }
-}
+  const staticCanvas = document.getElementById('static-canvas');
+  const staticCtx = staticCanvas.getContext('2d');
 
+  staticCanvas.width  = window.innerWidth;
+  staticCanvas.height = window.innerHeight;
+
+  let frames = 0;
+  const totalFrames = 18;
+  staticCanvas.style.opacity = '1';
+
+  function dibujarEstatico() {
+    const imageData = staticCtx.createImageData(staticCanvas.width, staticCanvas.height);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+      const valor = Math.random() > 0.5 ? 255 : 0;
+      data[i]     = valor;
+      data[i + 1] = valor;
+      data[i + 2] = valor;
+      data[i + 3] = Math.random() * 180 + 60;
+    }
+
+    staticCtx.putImageData(imageData, 0, 0);
+    frames++;
+
+    if (frames < totalFrames) {
+      requestAnimationFrame(dibujarEstatico);
+    } else {
+      staticCanvas.style.opacity = '0';
+    }
+  }
+
+  // Cambiar el mundo a la mitad del estático
+  setTimeout(() => {
+    if (body.classList.contains('mundo-real')) {
+      body.classList.replace('mundo-real', 'otra-madre');
+    } else {
+      body.classList.replace('otra-madre', 'mundo-real');
+    }
+  }, 150);
+
+  dibujarEstatico();
+}
 /* ================================================================
    CONFETI
    ================================================================ */
@@ -144,29 +180,125 @@ for (let i = 0; i < 18; i++) {
 /* ================================================================
    POLILLAS — giran alrededor de la luna
    ================================================================ */
-function crearPolilla() {
-  const polilla       = document.createElement('div');
-  polilla.innerHTML   = '🪲';
-  polilla.style.cssText = `
-    position: fixed; font-size: 12px;
-    pointer-events: none; z-index: 20;
-    filter: drop-shadow(0 0 2px #f5e642);
+function crearInsectoLuna() {
+  const insecto = document.createElement('div');
+  
+  // Estilo base
+  insecto.style.cssText = `
+    position: fixed; 
+    font-size: 20px;
+    pointer-events: none; 
+    z-index: 20;
+    transition: filter 0.8s ease;
   `;
-  document.body.appendChild(polilla);
+  document.body.appendChild(insecto);
 
-  let angulo       = Math.random() * Math.PI * 2;
-  const centroX    = window.innerWidth - 120;
-  const centroY    = 80;
+  let angulo = Math.random() * Math.PI * 2;
+  // Añadimos velocidades ligeramente diferentes a cada uno para que no vayan en fila
+  const velocidad = 0.008 + Math.random() * 0.006; 
+  // Radio de órbita individual para que no se encimen
+  const radioX = 75 + Math.random() * 15;
+  const radioY = 45 + Math.random() * 10;
 
   function mover() {
-    angulo += 0.01;
-    polilla.style.left = (centroX + Math.cos(angulo) * 80 + (Math.random() - 0.5) * 20) + 'px';
-    polilla.style.top  = (centroY + Math.sin(angulo) * 48 + (Math.random() - 0.5) * 20) + 'px';
+    // 1. Detectar en qué mundo estamos en este preciso frame
+    const esOtraMadre = document.body.classList.contains('otra-madre');
+
+    // 2. Cambiar aspecto según el mundo
+    if (!esOtraMadre) {
+      insecto.innerHTML = '🦋'; // Mariposa en Mundo Real
+      insecto.style.filter = 'drop-shadow(0 0 4px #b49fcc)'; // Brillo lila mágico
+    } else {
+      insecto.innerHTML = '🪲'; // Polilla/Escarabajo en Otra Madre
+      insecto.style.filter = 'drop-shadow(0 0 3px #ff3333) brightness(0.6)'; // Brillo rojo tétrico y opaco
+    }
+
+    // 3. Cálculo de la órbita alrededor del centro actual de la luna
+    angulo += velocidad;
+    const luna = document.querySelector('.moon');
+    if (luna) {
+      const rect = luna.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top  + rect.height / 2;
+      
+      // Movimiento orbital con el toque errático de aleteo que creaste
+      insecto.style.left = (cx + Math.cos(angulo) * radioX + (Math.random() - 0.5) * 15) - 7 + 'px';
+      insecto.style.top  = (cy + Math.sin(angulo) * radioY + (Math.random() - 0.5) * 15) - 7 + 'px';
+    }
+
     requestAnimationFrame(mover);
   }
   mover();
 }
-setTimeout(() => { for (let i = 0; i < 3; i++) crearPolilla(); }, 8000);
+
+// Lanzar los insectos (puedes ajustar el tiempo para que coincida con la intro o la carta)
+setTimeout(() => { 
+  for (let i = 0; i < 4; i++) crearInsectoLuna(); 
+}, 7000);
+
+/* ================================================================
+   CURSOR PERSONALIZADO — aguja con hilo
+   ================================================================ */
+const cursorAguja = document.createElement('div');
+cursorAguja.id = 'cursor-aguja';
+cursorAguja.innerHTML = '🪡';
+cursorAguja.style.cssText = `
+  position: fixed;
+  font-size: 22px;
+  pointer-events: none;
+  z-index: 99999;
+  transform: rotate(90deg);
+  transition: transform 0.1s ease;
+  filter: drop-shadow(0 0 4px rgba(180, 140, 255, 0.8));
+`;
+const hiloCanvas = document.createElement('canvas');
+hiloCanvas.id = 'hilo-canvas';
+hiloCanvas.style.cssText = `
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99998;
+`;
+hiloCanvas.width  = window.innerWidth;
+hiloCanvas.height = window.innerHeight;
+document.body.appendChild(hiloCanvas);
+const hiloCtx = hiloCanvas.getContext('2d');
+
+window.addEventListener('resize', () => {
+  hiloCanvas.width  = window.innerWidth;
+  hiloCanvas.height = window.innerHeight;
+});
+document.body.appendChild(cursorAguja);
+
+const puntos = [];
+const MAX_PUNTOS = 35;
+
+document.addEventListener('mousemove', e => {
+  cursorAguja.style.left = (e.clientX - 8) + 'px';
+  cursorAguja.style.top  = (e.clientY - 8) + 'px';
+
+  puntos.push({ x: e.clientX, y: e.clientY });
+  if (puntos.length > MAX_PUNTOS) puntos.shift();
+
+  hiloCtx.clearRect(0, 0, hiloCanvas.width, hiloCanvas.height);
+
+  if (puntos.length < 2) return;
+
+  hiloCtx.beginPath();
+  hiloCtx.moveTo(puntos[0].x, puntos[0].y);
+
+  for (let i = 1; i < puntos.length - 1; i++) {
+    const mx = (puntos[i].x + puntos[i + 1].x) / 2;
+    const my = (puntos[i].y + puntos[i + 1].y) / 2;
+    hiloCtx.quadraticCurveTo(puntos[i].x, puntos[i].y, mx, my);
+  }
+
+  hiloCtx.strokeStyle = 'rgba(180, 140, 255, 0.7)';
+  hiloCtx.lineWidth   = 1.5;
+  hiloCtx.lineCap     = 'round';
+  hiloCtx.stroke();
+});
+
 
 /* ================================================================
    OJOS DE LA LUNA — siguen el cursor
@@ -217,6 +349,19 @@ setInterval(() => {
   }
 }, 4000);
 
+
+/* ================================================================
+   MÚSICA DE FONDO — reanuda desde donde quedó en intro.html
+   ================================================================ */
+const musicaFondo = document.getElementById('musica-fondo');
+musicaFondo.volume = 0.4;
+
+const tiempoGuardado = sessionStorage.getItem('musicaTime');
+if (tiempoGuardado) {
+  musicaFondo.currentTime = parseFloat(tiempoGuardado);
+  sessionStorage.removeItem('musicaTime');
+}
+musicaFondo.play();
 // Limpiar 'entered' al cerrar/recargar la página
 window.addEventListener('beforeunload', () => {
   sessionStorage.removeItem('entered');
