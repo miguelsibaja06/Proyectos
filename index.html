@@ -32,7 +32,9 @@
       <span class="toggle-label" id="lbl-otra">Otra Madre</span>
     </div>
 
+    <img src="puerta.png" class="puerta-bg" alt="puerta">
     <img src="gato.png" class="gato-bl" alt="">
+    <img src="gato2.png" class="gato-om" alt="">
     <img src="rama.png" class="rama-tl" alt="">
     <img src="rama.png" class="rama-br" alt="">
     <div class="spider-wrap">
@@ -213,6 +215,28 @@
       <h1 class="titulo-otra-madre">✦ They Will Be Mine ✦</h1>
       <p id="msg"></p>
     </div>
+    <!-- ============ BOTONES SECRETOS OCULTOS ============ -->
+    <div class="secretos-wrap" id="secretos-wrap">
+      <button class="secreto" data-id="0" style="top:6%; left:33%;">✦</button>
+      <button class="secreto" data-id="1" style="top:90%; left:47%;">✦</button>
+      <button class="secreto" data-id="2" style="top:16%; left:42%;">✦</button>
+      <button class="secreto" data-id="3" style="top:34%; left:90%;">✦</button>
+      <button class="secreto" data-id="4" style="top:48%; left:5%;">✦</button>
+      <button class="secreto" data-id="5" style="top:62%; left:92%;">✦</button>
+    </div>
+
+    <div class="secreto-overlay" id="secreto-overlay">
+      <div class="secreto-card">
+        <p class="secreto-titulo">✦ Mensaje Secreto ✦</p>
+        <p class="secreto-msg" id="secreto-msg">Has encontrado algo que no debía ser descubierto...
+Pero algunas cosas están destinadas a encontrarse. ❤️
+En este mundo hay muchas puertas... pero yo siempre elegiría la que me lleva a ti.
+Porque entre tantos caminos, tantos mundos y tantos lugares por descubrir,
+encontrarte a ti fue, sin duda, mi mejor casualidad.</p>
+        <button class="secreto-close" id="secreto-close">cerrar</button>
+      </div>
+    </div>
+
     <script src="main.js"></script>
     <div class="fog"></div>
 </body>

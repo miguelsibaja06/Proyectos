@@ -230,20 +230,23 @@
       background: radial-gradient(ellipse at 50% 50%, rgba(190, 150, 255, 0.4) 0%, transparent 75%);
     }
 
-    /* ── CANVAS DEL TÚNEL (inicialmente invisible) ── */
-    #tunnel-canvas {
+    /* ── PORTAL GIF (reemplaza el túnel) ── */
+    #portal-gif {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: block;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(90vw, 90vh);
+      height: min(90vw, 90vh);
+      object-fit: cover;
+      border-radius: 50%;
       z-index: 20;
       opacity: 0;
       transition: opacity 1.5s ease;
       pointer-events: none;
+      box-shadow: 0 0 80px 30px rgba(140, 60, 255, 0.5), 0 0 200px 60px rgba(80, 0, 180, 0.3);
     }
-    #tunnel-canvas.visible {
+    #portal-gif.visible {
       opacity: 1;
     }
 
@@ -317,8 +320,8 @@
     <p class="open-hint">— toca para entrar —</p>
   </div>
 
-  <!-- Canvas del túnel (inicialmente oculto) -->
-  <canvas id="tunnel-canvas"></canvas>
+  <!-- Portal GIF (reemplaza el túnel) -->
+  <img id="portal-gif" src="portal.gif" alt="portal">
   <div class="transition-overlay" id="transitionOverlay"></div>
   <div id="finalFade" style="
   position: fixed;
@@ -389,146 +392,11 @@
     }
 
     /* ==========================
-       TÚNEL (código adaptado de tunnel.js)
+       PORTAL GIF (reemplaza el túnel)
     ========================== */
-    const tunnelCanvas = document.getElementById('tunnel-canvas');
-    let ctxTunnel, Wt, Ht, cx, cy;
-    let tunnelAnimationId = null;
-    let rings = [], t = 0;
+    // No hay lógica de animación necesaria — el GIF se muestra/oculta con CSS
 
-    function initTunnel() {
-      Wt = window.innerWidth;
-      Ht = window.innerHeight;
-      tunnelCanvas.width = Wt;
-      tunnelCanvas.height = Ht;
-      ctxTunnel = tunnelCanvas.getContext('2d');
-      cx = Wt / 2;
-      cy = Ht / 2;
-
-      const RINGS = 18;
-      rings = Array.from({ length: RINGS }, (_, i) => ({
-        z: i / RINGS,
-        phase: (i / RINGS) * Math.PI * 2
-      }));
-    }
-
-    function easeInOut(x) {
-      return x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
-    }
-
-    function drawRing(progress, phase) {
-      const p = (progress + 1) % 1;
-      const depth = easeInOut(p);
-      const r = 20 + depth * (Math.min(Wt, Ht) * 1.1);
-
-      const alpha = p < 0.12 ? p / 0.12 : p > 0.82 ? (1 - p) / 0.18 : 1;
-      if (alpha <= 0) return;
-
-      const wobble = 20 * (1 - depth);
-      const pts = 120;
-      const rot = phase + p * Math.PI * 1.1;
-
-      ctxTunnel.beginPath();
-      for (let i = 0; i <= pts; i++) {
-        const a = (i / pts) * Math.PI * 2;
-        const noise =
-          Math.sin(a * 7 + phase * 3 + t * 0.8) * wobble +
-          Math.sin(a * 13 + phase * 5 - t * 1.2) * wobble * 0.4;
-        const rx = r + noise;
-        const ry = r * 0.97 + noise * 0.7;
-        const x = cx + Math.cos(a + rot) * rx;
-        const y = cy + Math.sin(a + rot) * ry;
-        i === 0 ? ctxTunnel.moveTo(x, y) : ctxTunnel.lineTo(x, y);
-      }
-      ctxTunnel.closePath();
-
-      const t1 = depth;
-      const br = Math.round(30 + t1 * 25);
-      const bg = 0;
-      const pr = Math.round(80 + t1 * 50);
-      const pb = Math.round(80 + t1 * 40);
-
-      const grd = ctxTunnel.createRadialGradient(cx, cy, r * 0.3, cx, cy, r * 1.1);
-      grd.addColorStop(0, 'rgba(0,0,0,0)');
-      grd.addColorStop(0.45, `rgba(${br},${bg},255,${0.22 * alpha})`);
-      grd.addColorStop(0.62, `rgba(${pr},0,${pb},${0.2 * alpha})`);
-      grd.addColorStop(1, 'rgba(4,1,14,0)');
-
-      ctxTunnel.fillStyle = grd;
-      ctxTunnel.fill();
-
-      const sr = Math.round(80 + t1 * 120);
-      const sg = Math.round(30 + t1 * 60);
-      ctxTunnel.strokeStyle = `rgba(${sr},${sg},255,${0.3 * alpha})`;
-      ctxTunnel.lineWidth = 1.2 + depth * 1.5;
-      ctxTunnel.stroke();
-    }
-
-    function drawDoorOnTunnel() {
-      const dw = 22, dh = 36;
-      const x = cx - dw / 2, y = cy - dh / 2;
-      ctxTunnel.fillStyle = '#04010f';
-      ctxTunnel.beginPath();
-      // roundRect manual
-      const radius = 2;
-      ctxTunnel.moveTo(x + radius, y);
-      ctxTunnel.lineTo(x + dw - radius, y);
-      ctxTunnel.quadraticCurveTo(x + dw, y, x + dw, y + radius);
-      ctxTunnel.lineTo(x + dw, y + dh - radius);
-      ctxTunnel.quadraticCurveTo(x + dw, y + dh, x + dw - radius, y + dh);
-      ctxTunnel.lineTo(x + radius, y + dh);
-      ctxTunnel.quadraticCurveTo(x, y + dh, x, y + dh - radius);
-      ctxTunnel.lineTo(x, y + radius);
-      ctxTunnel.quadraticCurveTo(x, y, x + radius, y);
-      ctxTunnel.fill();
-
-      ctxTunnel.shadowColor = 'rgba(130,60,255,0.9)';
-      ctxTunnel.shadowBlur = 18;
-      ctxTunnel.strokeStyle = 'rgba(160,100,255,0.7)';
-      ctxTunnel.lineWidth = 1;
-      ctxTunnel.stroke();
-      ctxTunnel.shadowBlur = 0;
-    }
-
-    function animateTunnel(timestamp) {
-      if (!ctxTunnel) return;
-      t = timestamp * 0.001;
-      ctxTunnel.clearRect(0, 0, Wt, Ht);
-
-      const speed = 0.19;
-      rings.forEach(ring => {
-        const progress = ((ring.z + t * speed) % 1 + 1) % 1;
-        drawRing(progress, ring.phase);
-      });
-
-      drawDoorOnTunnel();
-      tunnelAnimationId = requestAnimationFrame(animateTunnel);
-    }
-
-    function startTunnel() {
-      if (tunnelAnimationId) cancelAnimationFrame(tunnelAnimationId);
-      initTunnel();
-      tunnelAnimationId = requestAnimationFrame(animateTunnel);
-    }
-
-    // Ajustar tamaño del túnel al redimensionar
-    window.addEventListener('resize', () => {
-      if (tunnelCanvas.classList.contains('visible')) {
-        initTunnel();
-      } else {
-        // Si no visible, solo actualizamos variables para cuando se muestre
-        Wt = window.innerWidth;
-        Ht = window.innerHeight;
-        if (ctxTunnel) {
-          tunnelCanvas.width = Wt;
-          tunnelCanvas.height = Ht;
-          cx = Wt / 2;
-          cy = Ht / 2;
-        }
-      }
-    });
-
-    /* ABRIR PUERTA Y MOSTRAR TÚNEL SUAVEMENTE */
+    /* ABRIR PUERTA Y MOSTRAR PORTAL SUAVEMENTE */
     let transitionStarted = false;
     
 
@@ -538,54 +406,46 @@ function abrirPuerta() {
 
   const door = document.getElementById('door');
   const scene = document.getElementById('scene');
-  const tunnelCanvasElem = document.getElementById('tunnel-canvas');
+  const portalGif = document.getElementById('portal-gif');
   const overlay = document.getElementById('transitionOverlay');
-  const finalFade = document.getElementById('finalFade'); // nuevo elemento
+  const finalFade = document.getElementById('finalFade');
 
-
-
-  //0.musica de fondo
+  // 0. Música de fondo
   const musica = document.getElementById('musica-fondo');
   musica.volume = 0.4;
   musica.play();
+
   // 1. Abrir la puerta
   door.classList.add('open');
 
-  // 2. Iniciar el túnel (invisible aún)
-  startTunnel();
-
-  // 3. Desvanecer escena y activar overlay de entrada
+  // 2. Desvanecer escena y activar overlay de entrada
   setTimeout(() => {
     scene.classList.add('fade-out');
     overlay.classList.add('active');
   }, 300);
 
-  // 4. Mostrar túnel
+  // 3. Mostrar el portal GIF
   setTimeout(() => {
-    tunnelCanvasElem.classList.add('visible');
+    portalGif.classList.add('visible');
   }, 600);
 
-  // 5. Después de que el túnel se vea, ocultar el overlay de entrada para que no moleste
+  // 4. Quitar el overlay de entrada
   setTimeout(() => {
     overlay.classList.remove('active');
-  }, 2000); // a los 2 segundos (ajustable)
+  }, 2000);
 
-  // 6. Antes de redirigir, activar el FADE OUT con el nuevo elemento
+  // 5. Fade out final antes de redirigir
   setTimeout(() => {
-    finalFade.style.opacity = '1';   // comienza el oscurecimiento suave
-  }, 4300); // 4.3 segundos después de abrir
+    finalFade.style.opacity = '1';
+  }, 4300);
 
-  // 7. Redirigir cuando el fade lleve un rato
+  // 6. Redirigir a index.html
   setTimeout(() => {
-    if (tunnelAnimationId) {
-      cancelAnimationFrame(tunnelAnimationId);
-      tunnelAnimationId = null;
-    }
     const musica = document.getElementById('musica-fondo');
     sessionStorage.setItem('musicaTime', musica.currentTime);
     sessionStorage.setItem('entered', '1');
     window.location.href = 'index.html';
-  }, 5400); // 5.4 segundos (1.1 segundos de fade antes de cambiar)
+  }, 5400);
 }
 
     // Animación de la araña extra
@@ -634,7 +494,7 @@ window.addEventListener('resize', () => {
 document.body.appendChild(cursorAguja);
 
 const puntos = [];
-const MAX_PUNTOS = 35;
+const MAX_PUNTOS = 8;
 
 document.addEventListener('mousemove', e => {
   cursorAguja.style.left = (e.clientX - 8) + 'px';

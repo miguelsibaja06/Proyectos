@@ -8,11 +8,11 @@ body.mundo-real {
   --accent:        #b49fcc;
   --accent2:       #c9a84c;
   --glow2:         rgba(245, 230, 66, .8);
-  --fog-color:     rgba(180, 159, 204, 0.2);
+  --fog-color:     rgba(118, 94, 151, 0.29);
   --moon-bg:       #f5e8a0;
   --moon-shadow:   rgba(245, 232, 160, .6);
   --moon-shadow2:  rgba(245, 232, 160, .8);
-  --bg:            #0a0a1a;
+  --bg:            #0d081b;
   --web-color:     rgba(180, 159, 204, .5);
   --firefly:       #f5e642;
   --firefly-glow:  rgba(245, 230, 66, .6);
@@ -146,6 +146,7 @@ body.otra-madre #cake {
 .velas {
   background: #fbfbfb; border-radius: 10px;
   position: absolute; top: 228px; left: 50%;
+  z-index: 6; 
   margin-left: -2.4px; margin-top: -8.33px;
   width: 5px; height: 35px;
   transform: translateX(-50%) translateY(-300px);
@@ -169,6 +170,7 @@ body.otra-madre .velas:before {
 .fuego {
   border-radius: 100%; position: absolute;
   top: -25px; left: 50%; margin-left: -4.6px;
+  z-index: 6; 
   width: 8.67px; height: 28px;
 }
 
@@ -204,10 +206,11 @@ body.otra-madre .fuego:nth-child(5) { animation: fuego-rojo 0.2s 6.5s infinite; 
 }
 @keyframes in { to { transform: translateX(-50%) translateY(0); } }
 
+
 /* ================================================================
    TEXTO
    ================================================================ */
-.text { text-align: center; padding: 0 1rem; }
+.text { text-align: center; padding: 0 1rem; position: relative; z-index: 6; width: 100%; }
 
 /* Títulos */
 .titulo-mundo-real,
@@ -417,6 +420,22 @@ body.otra-madre .button-eyes { display: flex; }
 }
 
 /* ================================================================
+   PUERTA
+   ================================================================ */
+.puerta-bg {
+  position: fixed;
+  top: 50%;
+  left: 52%;
+  transform: translate(-50%, -55%);
+  height: auto;
+  width: 300px;
+  z-index: 2;
+  pointer-events: none;
+  object-fit: contain;
+  opacity: 0.92;
+  filter: brightness(0.5) saturate(1.3);
+}
+/* ================================================================
    RAMAS
    ================================================================ */
 .rama-tl {
@@ -442,11 +461,37 @@ body.otra-madre .rama-br {
 .gato-bl {
   position: fixed; bottom: 0; left: 0;
   width: clamp(120px, 35vw, 220px);
-  pointer-events: none; z-index: 4;
+  pointer-events: none; z-index: 5;
   mix-blend-mode: lighten; transition: filter 0.8s;
 }
 body.otra-madre .gato-bl {
   filter: sepia(.5) hue-rotate(-20deg) saturate(2) brightness(.8);
+}
+/* ================================================================
+   GATO otra madre
+   ================================================================ */
+.gato-om {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: clamp(120px, 35vw, 220px);
+  pointer-events: none;
+  z-index: 5;
+  mix-blend-mode: normal;          /* sin blend para que se vea bien oscuro */
+  opacity: 0;
+  transition: opacity 0.8s ease, filter 0.8s;
+  filter: drop-shadow(0 0 18px rgba(80, 0, 0, 0.9));
+}
+
+/* Ocultar gato normal en Otra Madre */
+body.otra-madre .gato-bl {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Mostrar gato oscuro solo en Otra Madre */
+body.otra-madre .gato-om {
+  opacity: 1;
 }
 
 /* ================================================================
@@ -466,4 +511,124 @@ body.otra-madre::after { opacity: 1; }
 /* Transición fluida para los rellenos internos de tu SVG */
 #cake path[fill], #cake rect[fill] {
   transition: fill 0.8s ease-in-out;
+}
+/* ================================================================
+   BOTONES SECRETOS OCULTOS
+   ================================================================ */
+.secretos-wrap {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 15;
+}
+
+.secreto {
+  position: fixed;
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font-size: 15px;
+  line-height: 26px;
+  text-align: center;
+  opacity: 0.14;
+  cursor: pointer;
+  pointer-events: auto;
+  padding: 0;
+  transition: opacity .4s ease, transform .4s ease, filter .4s ease, color .4s ease;
+  filter: drop-shadow(0 0 2px var(--accent));
+  animation: secretoFloat 5.5s ease-in-out infinite;
+}
+
+.secreto:hover {
+  opacity: 0.6;
+  transform: scale(1.35);
+}
+
+.secreto.encontrado {
+  opacity: 1;
+  color: var(--accent2);
+  filter: drop-shadow(0 0 10px var(--glow2));
+  animation: secretoPulso 1.7s ease-in-out infinite;
+  cursor: default;
+  pointer-events: none;
+}
+
+@keyframes secretoFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-7px); }
+}
+
+@keyframes secretoPulso {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.3); }
+}
+
+/* ── Tarjeta del mensaje secreto ── */
+.secreto-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 6, 14, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .8s ease;
+}
+
+.secreto-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.secreto-card {
+  max-width: 90vw;
+  width: 480px;
+  text-align: center;
+  padding: 2.2rem 1.8rem;
+  border: 1px solid var(--accent);
+  border-radius: 14px;
+  box-shadow: 0 0 50px var(--glow2), inset 0 0 30px rgba(0,0,0,.4);
+  background: rgba(20, 14, 34, 0.75);
+  backdrop-filter: blur(4px);
+}
+
+.secreto-titulo {
+  font-family: 'Cinzel Decorative', cursive;
+  font-size: 0.75rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--titulo-color);
+  text-shadow: 0 0 12px var(--titulo-shadow);
+  margin-bottom: 1.1rem;
+}
+
+.secreto-msg {
+  color: var(--msg-color);
+  text-shadow: 0 0 16px var(--msg-glow);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  margin-bottom: 1.6rem;
+  white-space: pre-line;
+}
+
+.secreto-close {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  padding: .5rem 1.3rem;
+  border-radius: 20px;
+  cursor: pointer;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: .65rem;
+  transition: background .3s ease, color .3s ease;
+}
+
+.secreto-close:hover {
+  background: var(--accent);
+  color: var(--bg);
 }

@@ -271,7 +271,7 @@ window.addEventListener('resize', () => {
 document.body.appendChild(cursorAguja);
 
 const puntos = [];
-const MAX_PUNTOS = 35;
+const MAX_PUNTOS = 8;
 
 document.addEventListener('mousemove', e => {
   cursorAguja.style.left = (e.clientX - 8) + 'px';
@@ -366,3 +366,45 @@ musicaFondo.play();
 window.addEventListener('beforeunload', () => {
   sessionStorage.removeItem('entered');
 });
+
+
+
+/* ================================================================
+   BOTONES SECRETOS OCULTOS
+   ================================================================ */
+(function () {
+  const secretos = document.querySelectorAll('.secreto');
+  if (!secretos.length) return;
+
+  const TOTAL_SECRETOS = secretos.length;
+  const encontrados = new Set(JSON.parse(localStorage.getItem('secretosEncontrados') || '[]'));
+
+  secretos.forEach(btn => {
+    const id = btn.dataset.id;
+    if (encontrados.has(id)) btn.classList.add('encontrado');
+
+    btn.addEventListener('click', () => {
+      if (encontrados.has(id)) return;
+      encontrados.add(id);
+      btn.classList.add('encontrado');
+      localStorage.setItem('secretosEncontrados', JSON.stringify([...encontrados]));
+
+      if (encontrados.size === TOTAL_SECRETOS) {
+        setTimeout(mostrarMensajeSecreto, 500);
+      }
+    });
+  });
+
+  function mostrarMensajeSecreto() {
+    const overlay = document.getElementById('secreto-overlay');
+    if (overlay) overlay.classList.add('visible');
+    if (typeof lanzarConfeti === 'function') lanzarConfeti();
+  }
+
+  const cerrar = document.getElementById('secreto-close');
+  if (cerrar) {
+    cerrar.addEventListener('click', () => {
+      document.getElementById('secreto-overlay').classList.remove('visible');
+    });
+  }
+})();
