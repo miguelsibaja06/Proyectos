@@ -367,8 +367,6 @@ window.addEventListener('beforeunload', () => {
   sessionStorage.removeItem('entered');
 });
 
-
-
 /* ================================================================
    BOTONES SECRETOS OCULTOS
    ================================================================ */
@@ -377,17 +375,14 @@ window.addEventListener('beforeunload', () => {
   if (!secretos.length) return;
 
   const TOTAL_SECRETOS = secretos.length;
-  const encontrados = new Set(JSON.parse(localStorage.getItem('secretosEncontrados') || '[]'));
+  const encontrados = new Set(); // se reinicia cada vez que se carga la página
 
   secretos.forEach(btn => {
-    const id = btn.dataset.id;
-    if (encontrados.has(id)) btn.classList.add('encontrado');
-
     btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
       if (encontrados.has(id)) return;
       encontrados.add(id);
       btn.classList.add('encontrado');
-      localStorage.setItem('secretosEncontrados', JSON.stringify([...encontrados]));
 
       if (encontrados.size === TOTAL_SECRETOS) {
         setTimeout(mostrarMensajeSecreto, 500);

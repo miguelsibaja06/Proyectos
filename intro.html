@@ -263,6 +263,38 @@
     .transition-overlay.active {
       opacity: 0.5;
     }
+    /* ── MENSAJE SOBRE EL PORTAL ── */
+    #portal-mensaje {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 0 24px;
+      text-align: center;
+      z-index: 25;
+      pointer-events: none;
+    }
+    .pm-linea {
+      font-family: 'Cinzel Decorative', cursive;
+      font-size: clamp(0.8rem, 3vw, 1.15rem);
+      letter-spacing: 4px;
+      line-height: 1.9;
+      color: #e6dcff;
+      text-shadow: 0 0 12px rgba(0,0,0,.9), 0 0 24px rgba(140,60,255,.7);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 1.4s ease, transform 1.4s ease;
+    }
+    .pm-final {
+      color: #f5e642;
+      text-shadow: 0 0 12px rgba(0,0,0,.9), 0 0 16px rgba(245,230,66,.7);
+    }
+    #portal-mensaje.visible .pm-linea { opacity: 1; transform: translateY(0); }
+    #portal-mensaje.visible .pm-final { transition-delay: 1.3s; }
+
     * { cursor: none !important; }
   </style>
 </head>
@@ -322,6 +354,12 @@
 
   <!-- Portal GIF (reemplaza el túnel) -->
   <img id="portal-gif" src="portal.gif" alt="portal">
+
+  <!-- Mensaje sobre el portal -->
+  <div id="portal-mensaje">
+    <p class="pm-linea">Cada año el cielo guarda una estrella nueva para ti.</p>
+    <p class="pm-linea pm-final">Esta noche, ve a buscarla.</p>
+  </div>
   <div class="transition-overlay" id="transitionOverlay"></div>
   <div id="finalFade" style="
   position: fixed;
@@ -434,10 +472,15 @@ function abrirPuerta() {
     overlay.classList.remove('active');
   }, 2000);
 
+  // 4b. Mensaje sobre el portal
+  const mensaje = document.getElementById('portal-mensaje');
+  setTimeout(() => mensaje.classList.add('visible'), 1800);
+  setTimeout(() => mensaje.classList.remove('visible'), 5400);
+
   // 5. Fade out final antes de redirigir
   setTimeout(() => {
     finalFade.style.opacity = '1';
-  }, 4300);
+  }, 6000);
 
   // 6. Redirigir a index.html
   setTimeout(() => {
@@ -445,7 +488,7 @@ function abrirPuerta() {
     sessionStorage.setItem('musicaTime', musica.currentTime);
     sessionStorage.setItem('entered', '1');
     window.location.href = 'index.html';
-  }, 5400);
+  }, 7100);
 }
 
     // Animación de la araña extra
